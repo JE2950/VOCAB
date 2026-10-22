@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}</style>
+<title>The Enchanted Block Tower</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: a blocky storybook. Stone tower frame, a scene band for each room, and a parchment question page below. One column, phone first. */
+:root {
+  --night: #1a1d3a;
+  --night-2: #2b2f5c;
+  --stone: #3b404d;
+  --stone-hi: #5a6070;
+  --stone-lo: #24272f;
+  --parch: #f3e7c6;
+  --parch-edge: #d9c48f;
+  --ink: #2a2017;
+  --ink-soft: #6b5843;
+  --gold: #f4c94e;
+  --emerald: #2fcf78;
+  --emerald-dk: #1b8a4e;
+  --ruby: #e0413f;
+  --ruby-dk: #9b2422;
+  --amethyst: #a77ce0;
+  --amethyst-dk: #5d3d91;
+  --text: #f5f1e6;
+  --text-dim: #b9b6c9;
+  --room-a: #2b2f5c;
+  --room-b: #1a1d3a;
+  --f-pixel: "Pixelify Sans", "Courier New", monospace;
+  --f-read: "Lexend", "Trebuchet MS", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  background: var(--night);
+  background-image:
+    radial-gradient(2px 2px at 12% 18%, #fff8 50%, transparent 51%),
+    radial-gradient(2px 2px at 78% 12%, #fff6 50%, transparent 51%),
+    radial-gradient(2px 2px at 40% 8%, #fff5 50%, transparent 51%),
+    radial-gradient(2px 2px at 90% 40%, #fff4 50%, transparent 51%),
+    linear-gradient(180deg, var(--night) 0%, var(--night-2) 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--f-read);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 40px;
+}
+h1, h2, h3, .pixel { font-family: var(--f-pixel); font-weight: 700; letter-spacing: .02em; text-wrap: balance; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: block; }
+
+/* Stone block button */
+.block-btn {
+  font-family: var(--f-pixel); font-weight: 700; font-size: 1.05rem;
+  color: var(--text); background: var(--stone);
+  border: 0; padding: 12px 18px;
+  box-shadow: inset -4px -4px 0 var(--stone-lo), inset 4px 4px 0 var(--stone-hi), 0 4px 0 #0007;
+  transition: transform .08s;
+}
+.block-btn:hover { background: #474d5c; }
+.block-btn:active { transform: translateY(2px); box-shadow: inset -4px -4px 0 var(--stone-lo), inset 4px 4px 0 var(--stone-hi); }
+.block-btn.grass { background: var(--emerald-dk); box-shadow: inset -4px -4px 0 #0f5a31, inset 4px 4px 0 #3fd889, 0 4px 0 #0007; }
+.block-btn.grass:hover { background: #20a05a; }
+.block-btn.magic { background: var(--amethyst-dk); box-shadow: inset -4px -4px 0 #3a2560, inset 4px 4px 0 var(--amethyst), 0 4px 0 #0007; }
+.block-btn.magic:hover { background: #6d4aa8; }
+.block-btn.small { font-size: .9rem; padding: 8px 12px; }
+
+/* ---------- Title ---------- */
+.title-card { text-align: center; display: grid; gap: 18px; justify-items: center; padding-top: 8px; }
+.title-card h1 { font-size: clamp(1.9rem, 7vw, 3rem); line-height: 1.05; margin: 0; color: var(--gold); text-shadow: 4px 4px 0 #000a; }
+.title-card .sub { margin: 0; color: var(--text-dim); max-width: 46ch; }
+.tower-art { display: flex; align-items: flex-end; gap: 10px; justify-content: center; }
+.panel {
+  background: var(--stone); width: 100%;
+  box-shadow: inset -5px -5px 0 var(--stone-lo), inset 5px 5px 0 var(--stone-hi);
+  padding: 16px; display: grid; gap: 12px; text-align: left;
+}
+.panel label, .lbl { font-family: var(--f-pixel); font-size: .95rem; color: var(--gold); letter-spacing: .04em; }
+.panel input[type=text] {
+  font: inherit; width: 100%; padding: 10px 12px; border: 0;
+  background: var(--parch); color: var(--ink);
+  box-shadow: inset 3px 3px 0 var(--parch-edge);
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-family: var(--f-pixel); font-size: .95rem; border: 0; padding: 8px 12px;
+  background: var(--stone-lo); color: var(--text-dim);
+  box-shadow: inset -3px -3px 0 #15171c, inset 3px 3px 0 #33373f;
+}
+.chip[aria-pressed="true"] { background: var(--gold); color: var(--ink); box-shadow: inset -3px -3px 0 #b88f23, inset 3px 3px 0 #ffe58f; }
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; width: 100%; }
+.mode {
+  border: 0; text-align: left; padding: 14px; color: var(--text);
+  display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center;
+  background: var(--stone);
+  box-shadow: inset -5px -5px 0 var(--stone-lo), inset 5px 5px 0 var(--stone-hi), 0 4px 0 #0007;
+}
+.mode:hover { background: #474d5c; }
+.mode .ico { grid-row: span 2; }
+.mode b { font-family: var(--f-pixel); font-size: 1.15rem; }
+.mode span { font-size: .85rem; color: var(--text-dim); grid-column: 2; }
+.mode.escape b { color: var(--gold); }
+.mode.quick b { color: var(--emerald); }
+.mode.book b { color: var(--amethyst); }
+.continue-note { font-size: .85rem; color: var(--text-dim); }
+
+/* ---------- HUD ---------- */
+.hud { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.hud .left, .hud .right { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.hearts { display: flex; gap: 3px; }
+.stat { font-family: var(--f-pixel); font-size: 1.05rem; display: flex; gap: 6px; align-items: center; font-variant-numeric: tabular-nums; }
+.icon-btn { background: var(--stone-lo); border: 0; color: var(--text-dim); font-family: var(--f-pixel); padding: 6px 10px; box-shadow: inset -3px -3px 0 #15171c, inset 3px 3px 0 #33373f; }
+.icon-btn:hover { color: var(--text); }
+
+/* ---------- Scene ---------- */
+.scene {
+  position: relative; height: 150px; overflow: hidden;
+  background: linear-gradient(180deg, var(--room-a), var(--room-b));
+  box-shadow: inset -5px -5px 0 #0006, inset 5px 5px 0 #ffffff14;
+}
+.scene::after { /* block floor */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 26px;
+  background:
+    repeating-linear-gradient(90deg, #0000 0 24px, #0005 24px 26px),
+    linear-gradient(180deg, var(--floor-top, #5a6070) 0 5px, var(--floor, #3b404d) 5px);
+}
+.scene .room-name { position: absolute; left: 12px; top: 10px; font-family: var(--f-pixel); font-weight: 700; font-size: 1.1rem; text-shadow: 2px 2px 0 #000; z-index: 2; }
+.scene .room-floor { position: absolute; left: 12px; top: 34px; font-size: .8rem; color: #fffc; text-shadow: 1px 1px 0 #000; z-index: 2; }
+.scene .pip { position: absolute; left: 14px; bottom: 24px; z-index: 2; }
+.scene .prop { position: absolute; right: 16px; bottom: 24px; z-index: 2; }
+.scene .bubble {
+  position: absolute; left: 84px; bottom: 58px; max-width: min(60%, 300px); z-index: 3;
+  background: var(--parch); color: var(--ink); font-size: .82rem; line-height: 1.35;
+  padding: 7px 10px; box-shadow: 3px 3px 0 #0008;
+}
+.scene .bubble::before { content: ""; position: absolute; left: -8px; bottom: 8px; border: 4px solid transparent; border-right-color: var(--parch); border-bottom-color: var(--parch); }
+.deco { position: absolute; z-index: 1; opacity: .9; }
+.bob { animation: bob 2.4s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-4px); } }
+
+.lockrow { display: flex; align-items: center; gap: 10px; margin: 12px 0 6px; flex-wrap: wrap; }
+.lockrow .lbl { font-size: .9rem; }
+.cells { display: flex; gap: 4px; flex-wrap: wrap; }
+.cell { width: 20px; height: 20px; background: var(--stone-lo); box-shadow: inset 2px 2px 0 #0007; }
+.cell.on { background: var(--gold); box-shadow: inset -3px -3px 0 #b88f23, inset 3px 3px 0 #ffe58f; }
+.cell.boss { background: var(--amethyst); box-shadow: inset -3px -3px 0 var(--amethyst-dk), inset 3px 3px 0 #d3b6ff; }
+.cell.boss.off { background: var(--stone-lo); box-shadow: inset 2px 2px 0 #0007; }
+
+/* ---------- Question page ---------- */
+.page {
+  background: var(--parch); color: var(--ink);
+  padding: 18px 18px 16px; position: relative;
+  box-shadow: inset -5px -5px 0 var(--parch-edge), 0 6px 0 #0008;
+  display: grid; gap: 14px;
+}
+.qmeta { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-family: var(--f-pixel); font-size: .85rem; color: var(--ink-soft); letter-spacing: .04em; }
+.qtype { background: var(--ink); color: var(--parch); padding: 2px 8px; }
+.prompt { font-size: 1.15rem; line-height: 1.5; margin: 0; }
+.prompt b.target { font-size: 1.3rem; background: #fff6; padding: 0 6px; box-shadow: 0 3px 0 var(--gold); }
+.prompt .blank { display: inline-block; min-width: 5ch; border-bottom: 3px solid var(--ink); }
+.prompt .sentence { display: block; margin-top: 8px; padding: 10px 12px; background: #fff7; font-size: 1.1rem; }
+.opts { display: grid; gap: 8px; }
+.opt {
+  display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: center;
+  text-align: left; border: 0; padding: 8px 12px 8px 8px; min-height: 50px;
+  background: #fffbea; color: var(--ink);
+  box-shadow: inset -3px -3px 0 var(--parch-edge), 0 2px 0 #0002;
+  font-size: 1rem; line-height: 1.35;
+}
+.opt:hover:not(:disabled) { background: #fff; transform: translateX(2px); }
+.opt .key {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  font-family: var(--f-pixel); font-weight: 700; color: var(--text); background: var(--stone);
+  box-shadow: inset -3px -3px 0 var(--stone-lo), inset 3px 3px 0 var(--stone-hi);
+}
+.opt:disabled { cursor: default; }
+.opt.right { background: #c9f5da; box-shadow: inset -3px -3px 0 var(--emerald-dk); }
+.opt.right .key { background: var(--emerald-dk); box-shadow: inset -3px -3px 0 #0f5a31, inset 3px 3px 0 #3fd889; }
+.opt.wrong { background: #f8d0cf; box-shadow: inset -3px -3px 0 var(--ruby-dk); }
+.opt.wrong .key { background: var(--ruby-dk); box-shadow: inset -3px -3px 0 #5e1312, inset 3px 3px 0 #f06a68; }
+.opt.faded { opacity: .5; }
+.feedback { display: grid; gap: 10px; padding: 12px; background: #fff8; border-left: 6px solid var(--emerald-dk); }
+.feedback.bad { border-left-color: var(--ruby-dk); }
+.feedback p { margin: 0; }
+.feedback .verdict { font-family: var(--f-pixel); font-weight: 700; font-size: 1.05rem; }
+.feedback .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hint-key { font-size: .78rem; color: var(--ink-soft); }
+
+/* ---------- Story / cleared / win ---------- */
+.story { display: grid; gap: 14px; }
+.story .page p { margin: 0; font-size: 1.05rem; }
+.story .page h2 { margin: 0; font-size: 1.5rem; }
+.center { text-align: center; justify-items: center; }
+.loot { display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.inv { display: flex; gap: 6px; flex-wrap: wrap; }
+.inv .slot { width: 44px; height: 44px; display: grid; place-items: center; background: #8b8b8b; box-shadow: inset 3px 3px 0 #373737, inset -3px -3px 0 #fff8; }
+.inv .slot.empty svg { opacity: .15; filter: grayscale(1); }
+.cert { border: 6px double var(--ink); padding: 18px; display: grid; gap: 10px; text-align: center; justify-items: center; }
+.cert h2 { color: var(--amethyst-dk); font-size: 1.7rem; margin: 0; }
+.statgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; width: 100%; }
+.statgrid div { background: #fff8; padding: 8px; display: grid; }
+.statgrid b { font-family: var(--f-pixel); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.statgrid span { font-size: .8rem; color: var(--ink-soft); }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+/* ---------- Quick fire ---------- */
+.timerbar { height: 18px; background: var(--stone-lo); box-shadow: inset 2px 2px 0 #0008; margin-bottom: 12px; }
+.timerbar i { display: block; height: 100%; background: var(--emerald); box-shadow: inset 0 -4px 0 var(--emerald-dk); transition: width .25s linear; }
+.timerbar.low i { background: var(--ruby); box-shadow: inset 0 -4px 0 var(--ruby-dk); }
+.combo { font-family: var(--f-pixel); color: var(--gold); min-width: 6ch; }
+.qf-word { font-family: var(--f-pixel); font-size: clamp(1.6rem, 6vw, 2.2rem); text-align: center; margin: 4px 0; }
+.missed { display: grid; gap: 6px; max-height: 280px; overflow: auto; text-align: left; width: 100%; }
+.missed div { background: #fff8; padding: 6px 10px; font-size: .92rem; }
+
+/* ---------- Spellbook ---------- */
+.book-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.book-tools input { flex: 1 1 200px; min-width: 0; font: inherit; padding: 10px 12px; border: 0; background: var(--parch); color: var(--ink); box-shadow: inset 3px 3px 0 var(--parch-edge); }
+.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.entry { background: var(--parch); color: var(--ink); padding: 10px 12px; box-shadow: inset -3px -3px 0 var(--parch-edge); min-width: 0; }
+.entry b { font-family: var(--f-pixel); font-size: 1.1rem; display: flex; justify-content: space-between; gap: 6px; }
+.entry b small { font-family: var(--f-read); font-weight: 400; font-size: .7rem; color: var(--ink-soft); align-self: center; }
+.entry p { margin: 2px 0 0; font-size: .9rem; }
+.entry.weak { box-shadow: inset -3px -3px 0 var(--parch-edge), inset 5px 0 0 var(--ruby); }
+.legend { font-size: .82rem; color: var(--text-dim); }
+
+/* particles */
+.fx { position: fixed; width: 10px; height: 10px; pointer-events: none; z-index: 50; animation: fly .9s ease-out forwards; }
+@keyframes fly { to { transform: translate(var(--dx), var(--dy)) rotate(180deg); opacity: 0; } }
+.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
+@media (prefers-reduced-motion: reduce) { .bob, .shake, .fx { animation: none !important; } .fx { display: none; } }
+@media (max-width: 460px) {
+  .scene { height: 140px; }
+  .scene .bubble { left: 74px; font-size: .76rem; }
+  .prompt { font-size: 1.05rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app">
+
+  <!-- TITLE -->
+  <section id="s-title" class="title-card">
+    <div class="tower-art" id="titleArt"></div>
+    <h1>The Enchanted<br>Block Tower</h1>
+    <p class="sub">Hexabel the witch has locked you at the top of her tower. Only a true word wizard can unlock every door. Answer questions, collect emeralds and escape!</p>
+    <div class="panel">
+      <label for="heroName">Your name, brave adventurer</label>
+      <input type="text" id="heroName" maxlength="20" placeholder="Type your name" autocomplete="off">
+      <span class="lbl">Which words?</span>
+      <div class="chips" id="setChips">
+        <button class="chip" data-set="all" aria-pressed="true">All words</button>
+        <button class="chip" data-set="spell" aria-pressed="false">Spelling list</button>
+        <button class="chip" data-set="story" aria-pressed="false">Story &amp; grammar words</button>
+      </div>
+      <span class="continue-note" id="setCount"></span>
+    </div>
+    <div class="modes">
+      <button class="mode escape" id="goEscape"><span class="ico" id="icoKey"></span><b>Escape Room</b><span>Six locked rooms. Answer to escape.</span></button>
+      <button class="mode quick" id="goQuick"><span class="ico" id="icoClock"></span><b>Quick Fire</b><span>60 seconds. How many can you get?</span></button>
+      <button class="mode book" id="goBook"><span class="ico" id="icoBook"></span><b>Spellbook</b><span>Read every word and meaning.</span></button>
+    </div>
+    <p class="continue-note" id="continueNote" hidden></p>
+  </section>
+
+  <!-- STORY / ROOM INTRO -->
+  <section id="s-story" class="story" hidden>
+    <div class="scene" id="storyScene"></div>
+    <div class="page">
+      <h2 id="storyTitle"></h2>
+      <p id="storyText"></p>
+      <div class="inv" id="storyInv"></div>
+      <div class="btnrow" style="justify-content:flex-start">
+        <button class="block-btn grass" id="storyGo">Enter the room</button>
+        <button class="block-btn small" id="storyHome">Back to title</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section id="s-play" hidden>
+    <div class="hud">
+      <div class="left"><div class="hearts" id="hearts"></div></div>
+      <div class="right">
+        <span class="stat" id="emeralds"></span>
+        <span class="stat" id="streak"></span>
+        <button class="icon-btn" id="soundBtn" aria-label="Sound on or off">Sound: on</button>
+        <button class="icon-btn" id="quitBtn">Exit</button>
+      </div>
+    </div>
+    <div class="scene" id="scene"></div>
+    <div class="lockrow"><span class="lbl" id="lockLbl">Door lock</span><div class="cells" id="cells"></div></div>
+    <div class="page" id="qpage"></div>
+  </section>
+
+  <!-- CLEARED -->
+  <section id="s-cleared" class="story" hidden>
+    <div class="page center">
+      <h2 id="clearTitle">Door unlocked!</h2>
+      <div class="loot" id="clearLoot"></div>
+      <p id="clearText"></p>
+      <div class="inv" id="clearInv"></div>
+      <div class="btnrow"><button class="block-btn grass" id="clearNext">Onwards</button></div>
+    </div>
+  </section>
+
+  <!-- WIN -->
+  <section id="s-win" class="story" hidden>
+    <div class="scene" id="winScene"></div>
+    <div class="page">
+      <div class="cert">
+        <span class="pixel" style="color:var(--ink-soft)">By royal decree</span>
+        <h2 id="winName">Word Wizard</h2>
+        <p id="winText"></p>
+        <div class="statgrid" id="winStats"></div>
+      </div>
+      <div class="btnrow"><button class="block-btn grass" id="winAgain">Play again</button><button class="block-btn" id="winHome">Title screen</button></div>
+    </div>
+  </section>
+
+  <!-- QUICK FIRE -->
+  <section id="s-quick" hidden>
+    <div class="hud">
+      <div class="left"><span class="stat" id="qfScore">Score 0</span><span class="combo" id="qfCombo"></span></div>
+      <div class="right"><span class="stat" id="qfTime">60s</span><button class="icon-btn" id="qfQuit">Exit</button></div>
+    </div>
+    <div class="timerbar" id="qfBar"><i></i></div>
+    <div class="page" id="qfPage"></div>
+  </section>
+
+  <!-- QUICK FIRE END -->
+  <section id="s-qend" hidden>
+    <div class="page center">
+      <h2 id="qendTitle">Time's up!</h2>
+      <div class="statgrid" id="qendStats"></div>
+      <span class="lbl" style="color:var(--ink)" id="missedLbl">Words to practise</span>
+      <div class="missed" id="missedList"></div>
+      <div class="btnrow"><button class="block-btn grass" id="qendAgain">Go again</button><button class="block-btn" id="qendHome">Title screen</button></div>
+    </div>
+  </section>
+
+  <!-- SPELLBOOK -->
+  <section id="s-book" hidden>
+    <div class="hud"><h2 style="margin:0;color:var(--amethyst)">Spellbook</h2><button class="icon-btn" id="bookHome">Back</button></div>
+    <div class="book-tools"><input type="text" id="bookSearch" placeholder="Search a word or meaning"><span class="legend">Red edge = needs practice</span></div>
+    <div class="book-grid" id="bookGrid"></div>
+  </section>
+</div>
+
+<script>
+/* ================= WORD BANK =================
+   word | form used in sentences | part of speech | definition | sentence | confusable group
+   Groups stop near-synonyms appearing as wrong answers for each other. */
+const RAW = `#spell
+accommodate||v|to provide a room or space for someone|The new hotel can ___ up to forty guests.|
+accompany||v|to go somewhere with someone|Will you ___ me to the village market?|
+according||adv|as stated or reported by (according to)|The treasure is buried under the oak tree, ___ to the map.|
+achieve||v|to succeed in doing something after a lot of effort|If you practise every day, you will ___ your goal.|
+aggressive||a|ready to attack or fight; hostile|The ___ wolf snarled and lunged at the shepherd.|
+amateur||n|someone who does an activity for fun, not as a paid job|She is not paid for her paintings because she is only a keen ___.|
+ancient||a|very old; from long ago|The ___ castle had stood on the hill for a thousand years.|
+apparent||a|clearly seen or understood; obvious|From her muddy boots, it was ___ that she had been in the forest.|
+appreciate||v|to be thankful for; to value something|I really ___ all the help you gave me with my homework.|
+attached||a|joined or fastened to something; very fond of|A label was ___ to the parcel with string.|
+available||a|free or ready to be used or bought|Are there any seats ___ on the next train?|
+average||a|ordinary or typical; usual|On a normal, ___ day, the baker sells two hundred loaves.|
+awkward||a|clumsy; difficult or embarrassing|There was a long, ___ silence after he forgot her name.|
+bargain||n|something bought for less than it is worth; a good deal|At only fifty pence, the old book was a real ___.|
+bruise||n|a dark mark on the skin caused by a knock|After falling off her pony, she had a purple ___ on her knee.|
+category||n|a group of things that are alike in some way|Apples and pears belong in the fruit ___.|
+cemetery||n|a place where dead people are buried|Ivy covered the old gravestones in the village ___.|
+committee||n|a group of people chosen to make decisions|The ___ voted to hold the summer fair in June.|
+communicate||v|to share information or ideas with others|Dolphins ___ with each other using clicks and whistles.|
+community||n|a group of people who live in the same place|The whole village ___ came together to rebuild the bridge.|
+competition||n|a contest to find the best or the winner|She won first prize in the baking ___.|
+conscience||n|the voice inside you that tells you right from wrong|His ___ told him he should own up to breaking the vase.|
+conscious||a|awake and aware of what is around you|After fainting, the knight was ___ again within a minute.|
+controversy||n|strong public disagreement about something|The plan to close the library caused great ___ in the town.|
+convenience||n|something that makes life easier; ease|For extra ___, the shop is right next to the station.|
+correspond||v|to write letters to each other; to match|The two pen pals ___ by letter every month.|
+criticise||v|to point out faults in someone or something|It is unkind to ___ someone's drawing without saying something nice too.|
+curiosity||n|a strong wish to know or learn something|Filled with ___, Alice peered through the tiny door.|
+definite||a|certain; clear and fixed|We need a ___ answer by Friday, not a "maybe".|
+desperate||a|having lost almost all hope; in great need|Lost in the desert, the travellers were ___ for water.|dd
+determined||a|having made a firm decision and refusing to give up|Nothing would stop her: she was ___ to reach the top of the mountain.|dd
+develop||v|to grow or change over time|Tadpoles slowly ___ into frogs.|
+dictionary||n|a book that lists words in alphabetical order and gives their meanings|Look up the meaning of the word in a ___.|
+disastrous||a|causing great damage or total failure|The flood was ___ for the farmers, who lost all their crops.|
+embarrass||v|to make someone feel awkward or ashamed|Please don't ___ me by singing loudly in front of my friends.|
+environment||n|the natural world; your surroundings|Dropping litter harms the ___.|
+equipment||n|the tools or things needed for an activity|The climbers checked their ropes and other ___ before setting off.|
+especially||adv|more than usual; particularly|I love all fruit, but ___ strawberries.|
+exaggerate||v|to make something sound bigger or better than it really is|Don't ___! You did not catch a fish as big as a whale.|
+excellent||a|extremely good|Your story was ___, so I gave it full marks.|good
+existence||n|the state of being real or alive|Scientists doubt the ___ of the Loch Ness Monster.|
+explanation||n|something said or written that makes something clear|The teacher gave a clear ___ of how volcanoes erupt.|
+familiar||a|well known; easily recognised|The song sounded ___, as if she had heard it before.|
+foreign||a|from or belonging to another country|He enjoys learning ___ languages such as French and Spanish.|
+forty||num|the number 40 (four tens)|There are ___ thieves in the old tale of Ali Baba.|
+frequently||adv|often; many times|My grandparents visit ___, about three times a week.|
+government||n|the group of people who run a country|The ___ has announced a new law about school holidays.|
+guarantee||n|a promise that something will happen or will work|The toaster comes with a two-year ___.|
+harass||v|to keep pestering or bothering someone|Seagulls ___ people on the beach for their chips.|
+hindrance||n|something that gets in the way and makes things harder|Her heavy rucksack was a ___ as she climbed the steep path.|
+identity||n|who or what someone is|The masked knight refused to reveal his true ___.|
+immediately||adv|at once; without delay|When the fire alarm rings, leave the building ___.|
+individual||n|a single, separate person|Each ___ in the class will get their own certificate.|
+interfere||v|to get involved in something that is not your business|Please don't ___ while I'm mending the clock.|ii
+interrupt||v|to stop someone while they are speaking or doing something|It is rude to ___ someone while they are talking.|ii
+language||n|the words people use to speak and write to each other|Welsh is the ___ spoken in many parts of Wales.|
+leisure||n|free time for relaxing and enjoying yourself|In her ___ time, she likes to read and ride her bike.|
+lightning||n|a flash of light in the sky during a storm|A bolt of ___ struck the old oak tree.|
+marvellous||a|wonderful; amazing|We had a ___ time at the seaside.|good
+mischievous||a|playfully naughty|The ___ kitten unrolled all the toilet paper.|
+muscle||n|a part of the body that tightens and relaxes to make you move|He pulled a ___ in his leg while sprinting.|
+necessary||a|needed; essential|Water is ___ for all living things.|
+neighbour||n|someone who lives next door or nearby|Our ___ fed the cat while we were on holiday.|
+nuisance||n|an annoying person or thing; an annoyance|The buzzing fly was a real ___.|
+occupy||v|to fill or take up a space or time; to live in|Jigsaw puzzles ___ my little brother for hours.|
+occur||v|to happen|Earthquakes ___ when parts of the Earth's crust move.|
+opportunity||n|a chance to do something|The school trip was a great ___ to see the Roman ruins.|
+parliament||n|the group of people elected to make a country's laws|Members of ___ debate new laws in Westminster.|
+persuade||v|to make someone agree by giving good reasons|She tried to ___ her dad to let her have a puppy.|
+physical||a|to do with the body|Rugby is a very ___ sport.|
+prejudice||n|an unfair opinion formed without knowing the facts|Judging someone by their accent is a form of ___.|
+privilege||n|a special right or advantage|It was a ___ to meet the famous author.|
+profession||n|a job that needs special training or study|Teaching is a rewarding ___.|
+programme||n|a show on TV or radio; a plan of events|My favourite nature ___ is on at six o'clock.|
+pronunciation||n|the way a word is said|The ___ of "colonel" surprises many people.|
+queue||n|a line of people waiting their turn|We waited in a long ___ for the roller coaster.|
+recognise||v|to know someone or something because you have seen it before|I didn't ___ you with your new haircut!|
+recommend||v|to say that something is good and worth trying|I ___ the chocolate cake because it's delicious.|rs
+relevant||a|connected to what is being talked about|Only include facts that are ___ to the question.|
+restaurant||n|a place where you pay to sit and eat a meal|We booked a table at an Italian ___ for Mum's birthday.|
+rhyme||n|a word that ends with the same sound as another|"Cat" is a ___ for "hat".|
+rhythm||n|a regular, repeated pattern of beats or sounds|We clapped along to the ___ of the drum.|
+sacrifice||n|giving up something you value for something more important|She made a ___ by giving all her pocket money to charity.|
+secretary||n|a person who deals with letters, records and appointments|The school ___ answered the phone and booked the meeting.|
+shoulder||n|the joint between your arm and your neck|The parrot sat on the pirate's ___.|
+signature||n|your name written in your own special way|Please add your ___ at the bottom of the letter.|
+sincerely||adv|honestly; truly meaning it|"I am ___ sorry," he said, and he really meant it.|
+soldier||n|a person who serves in an army|The ___ marched proudly past the palace.|
+stomach||n|the organ in your body where food is broken down|My ___ rumbled because I had skipped breakfast.|
+sufficient||a|enough|Is there ___ food for everyone at the party?|
+suggest||v|to put forward an idea for others to think about|Can I ___ that we play outside instead?|rs
+symbol||n|a sign or picture that stands for something|The dove is a ___ of peace.|
+system||n|a set of parts or steps that work together|The library uses a clever ___ to sort its books by subject.|
+temperature||n|how hot or cold something is|The ___ dropped below freezing last night.|
+thorough||a|careful and complete, missing nothing out|The detective made a ___ search of the room.|
+twelfth||num|number 12 in a series|December is the ___ month of the year.|
+variety||n|a range of different things|The sweet shop sells a huge ___ of sweets.|
+vegetable||n|a plant, or part of a plant, eaten as food|A carrot is a root ___.|
+vehicle||n|something used to carry people or goods, such as a car or lorry|A tractor is a farm ___.|
+yacht||n|a sailing boat used for racing or holidays|The ___ glided across the bay with its white sails billowing.|
+#story
+companion||n|someone you do something with|Her dog was her faithful ___ on long walks.|
+nemesis||n|your greatest enemy|The wicked witch was the princess's ___.|
+workforce||n|all the people who are doing the work|The toy factory has a ___ of three hundred elves.|
+fictional||a|made up; not real|Cinderella is a ___ character.|
+fable||n|a short story that teaches a lesson, often with animals|"The Tortoise and the Hare" is a ___ about patience.|
+pint||n|a measurement of liquid|The milkman left a ___ of milk on the doorstep.|
+initial||a|happening at the beginning|My ___ plan was to walk, but then it started to rain.|first
+quarrel||n|an angry argument or disagreement|The twins had a ___ over who would get the last biscuit.|
+lumber||v|to move slowly and awkwardly (as a noun: chopped wood)|The giant began to ___ through the forest, shaking the trees.|
+inferno||n|a large fire that is dangerously out of control|The dragon's breath turned the barn into a blazing ___.|
+bewildered||a|completely puzzled or confused|Lost in the maze, the prince felt completely ___.|
+inaugural||a|the first in a series; marking a beginning|The ___ village fete was such a success that it became a yearly event.|first
+misgivings||n|feelings of doubt; reservations|She had ___ about crossing the rickety rope bridge.|
+credible||a|believable|His excuse that a dragon ate his homework was not ___.|
+equitable||a|fair and just|The pirates wanted every crew member to get a fair, ___ share of the gold.|
+absurd||a|silly; making no sense|The idea of a fish riding a bicycle is completely ___.|silly
+preposterous||a|ridiculous; completely unreasonable|Claiming that the moon is made of cheese is ___!|silly
+rough||a|not smooth|The bark of the oak tree felt ___ under her fingers.|
+corrosive||a|able to eat or burn through things, like an acid|The witch's ___ potion burned a hole straight through the cauldron.|
+eruptive||a|likely to erupt or burst out|The ___ volcano spews out lava every few years.|boom
+volatile||a|highly unstable; likely to explode|The chemist handled the ___ liquid carefully in case it exploded.|boom
+harbour (noun)|harbour|n|a place where boats dock|The fishing boats sailed back into the ___ at sunset.|harbour
+harbour (verb)|harbour|v|to give someone shelter (you might harbour a criminal!)|It is against the law to ___ a criminal.|harbour
+house (noun)|house|n|a building you might live in|The family lived in a small ___ beside the river.|house
+house (verb)|house|v|to give something a home (you might house a stray cat)|The new museum will ___ the ancient treasures.|house
+accommodation||n|a place where someone can stay or live|The inn offered ___ for travellers on their way to the city.|
+inconspicuous||a|not easily seen; not noticeable|The spy wore grey to stay ___ in the crowd.|
+solemn||a|serious; grave|The funeral was a quiet and ___ occasion.|
+unorthodox||a|breaking with what is normal or traditional|Her ___ way of teaching, with lessons held up in the treetops, broke every rule.|odd
+radical||a|extreme; very different from what came before|The king made ___ changes, knocking down the whole castle to start again.|odd
+eccentric||a|unusual and slightly strange|The ___ old wizard wore odd socks and kept an owl in his hat.|odd
+conformist||n|someone who behaves the same way as everyone else|A true ___, he always wore exactly what his friends wore.|
+consecutive||a|one after another, without a break|It rained for five ___ days.|
+inert||a|not moving; lifeless|The dragon lay ___ on the cave floor, as still as stone.|still
+immobile||a|unable to move; not moving|With his leg in plaster, he was ___ for weeks.|still
+unresponsive||a|not reacting or answering|The robot was ___: however many buttons we pressed, it did nothing.|still
+dominion||n|land ruled by a king or queen, often won in war|The emperor ruled over a vast ___.|land
+territory||n|an area of land that belongs to someone|The fox marked its ___ to warn other foxes away.|land
+itinerant||a|travelling from place to place|The ___ minstrel wandered from village to village, singing for his supper.|
+wail||v|to cry out loudly|The baby began to ___ when her rattle fell on the floor.|
+whirl||v|to turn or spin around very quickly|Autumn leaves ___ in the wind.|
+cyclone||n|a violent storm with heavy rain and winds that spin in a circle|The ___ tore the roofs off houses along the coast.|
+certainly||adv|without any doubt; surely|"Will you help me?" asked the princess. "___!" said the fox.|
+lulled||v|calmed or soothed by a gentle sound or movement|The gentle rocking of the boat ___ the baby to sleep.|
+eerie||a|strange and frightening|A strange, ___ howl echoed through the dark forest.|
+gumption||n|courage and initiative; common sense|It took real ___ to stand up to the bully.|
+noun||g|a person, place, thing or idea|In "The knight rode home", the word "knight" is a(n) ___.|
+verb||g|an action or doing word|In "The dragon roared", the word "roared" is a(n) ___.|
+adjective||g|a word that describes a noun|In "the shiny sword", the word "shiny" is a(n) ___.|
+adverb||g|a word that describes a verb (often ends in -ly)|In "She ran quickly", the word "quickly" is a(n) ___.|
+pronoun||g|a word that takes the place of a noun (he, she, I, you, they)|In "They found the key", the word "They" is a(n) ___.|
+simile||g|a comparison using "like" or "as"|"As brave as a lion" is a(n) ___.|
+dialogue||g|conversation between characters|The words characters say to each other, written in speech marks, are called ___.|`;
+
+const WORDS = [];
+(() => { let set = 'spell';
+  for (const line of RAW.split('\n')) {
+    if (!line.trim()) continue;
+    if (line[0] === '#') { set = line.slice(1).trim(); continue; }
+    const [word, form, pos, def, sent, group] = line.split('|');
+    WORDS.push({ word, form: form || word, pos, def, sent, group: group || '', set });
+  }
+})();
+const BY = Object.fromEntries(WORDS.map(w => [w.word, w]));
+
+/* Opposites: ISEB "most nearly opposite in meaning" */
+const OPP = [
+  ['ancient','modern',['old','ruined','rough']],
+  ['familiar','unknown',['well-known','friendly','similar']],
+  ['rough','smooth',['bumpy','coarse','hard']],
+  ['credible','unbelievable',['believable','honest','serious']],
+  ['inconspicuous','noticeable',['hidden','quiet','small']],
+  ['sufficient','not enough',['plenty','exactly right','enough']],
+  ['conformist','rebel',['follower','copycat','member']],
+  ['solemn','cheerful',['serious','grave','sad']],
+  ['equitable','unfair',['fair','equal','generous']],
+  ['initial','final',['first','early','opening']],
+  ['bewildered','clear-headed',['confused','puzzled','lost']],
+  ['aggressive','gentle',['fierce','hostile','angry']],
+  ['definite','uncertain',['sure','fixed','clear']],
+  ['frequently','rarely',['often','regularly','usually']],
+  ['awkward','graceful',['clumsy','embarrassing','difficult']],
+  ['excellent','dreadful',['superb','brilliant','fine']],
+  ['volatile','stable',['explosive','unstable','dangerous']],
+  ['amateur','professional',['beginner','hobbyist','learner']],
+  ['necessary','optional',['essential','vital','needed']],
+  ['inert','lively',['still','motionless','frozen']],
+  ['absurd','sensible',['silly','ridiculous','foolish']],
+  ['immediately','later',['at once','now','instantly']],
+  ['companion','enemy',['friend','partner','ally']],
+  ['itinerant','settled',['wandering','roving','travelling']],
+  ['eccentric','ordinary',['odd','quirky','unusual']],
+  ['conscious','unaware',['awake','alert','aware']],
+  ['foreign','native',['overseas','alien','distant']],
+  ['apparent','hidden',['obvious','clear','plain']],
+  ['thorough','careless',['careful','complete','detailed']],
+  ['marvellous','terrible',['wonderful','amazing','splendid']],
+];
+/* Odd one out: [key word, odd answer, the three that belong] */
+const ODD = [
+  ['preposterous','credible',['absurd','preposterous','ridiculous']],
+  ['inert','itinerant',['inert','immobile','motionless']],
+  ['solemn','mischievous',['solemn','serious','grave']],
+  ['quarrel','companion',['quarrel','argument','disagreement']],
+  ['whirl','lumber',['whirl','spin','twirl']],
+  ['cyclone','yacht',['cyclone','hurricane','tornado']],
+  ['bewildered','determined',['bewildered','puzzled','confused']],
+  ['simile','simile',['noun','verb','adverb']],
+  ['frequently','immediately',['frequently','often','regularly']],
+  ['eccentric','conformist',['eccentric','unorthodox','unconventional']],
+  ['equitable','aggressive',['equitable','fair','just']],
+  ['misgivings','guarantee',['misgivings','doubts','reservations']],
+  ['inconspicuous','apparent',['inconspicuous','hidden','unnoticeable']],
+  ['companion','nemesis',['companion','friend','partner']],
+  ['marvellous','disastrous',['marvellous','excellent','wonderful']],
+  ['harass','appreciate',['harass','pester','annoy']],
+  ['occur','occupy',['occur','happen','take place']],
+  ['sufficient','scarce',['sufficient','enough','adequate']],
+  ['wail','whisper',['wail','howl','shriek']],
+  ['inferno','puddle',['inferno','blaze','bonfire']],
+  ['dominion','vehicle',['dominion','territory','kingdom']],
+  ['fictional','genuine',['fictional','made-up','imaginary']],
+];
+/* Word use: one correct sentence and three that do not fit */
+const USE = [
+  ['harbour (verb)','In which sentence is "harbour" used as a verb (a doing word)?','The kind farmer agreed to harbour the runaway prince.',['The ships rocked gently in the harbour.','We walked along the harbour wall.','The harbour was full of fishing boats.']],
+  ['house (verb)','In which sentence is "house" used as a verb (a doing word)?','The old barn will house the rescued ponies.',['Their house had a red front door.','The house on the hill was empty.','We painted the house blue.']],
+  ['lumber','In which sentence does "lumber" mean chopped wood?','The woodcutter stacked the lumber beside his cottage.',['The bear began to lumber towards the river.','Elephants lumber slowly across the plain.','Watch the giant lumber down the lane.']],
+  ['lumber','In which sentence does "lumber" mean to move slowly and awkwardly?','The tired troll began to lumber back to his cave.',['The cart was piled high with lumber.','They built the raft from lumber.','The lumber was stacked by the barn.']],
+  ['consecutive','Which sentence uses "consecutive" correctly?','She won the race for three consecutive years.',['The consecutive cat purred on the mat.','He consecutive ran to the shop.','We ate a consecutive sandwich for lunch.']],
+  ['volatile','Which sentence uses "volatile" correctly?','The volatile mixture fizzed and then exploded.',['The volatile kitten slept peacefully all day.','She gave me a volatile hug.','The pond was calm and volatile.']],
+  ['nemesis','Which sentence uses "nemesis" correctly?','The hero finally faced his nemesis in the dark castle.',['She shared her sandwich with her nemesis and best friend.','My nemesis is a type of sandwich.','He wore his nemesis to the party.']],
+  ['lulled','Which sentence uses "lulled" correctly?','The soft music lulled the baby to sleep.',['The loud alarm lulled everyone awake.','He lulled the ball across the field.','The thunder lulled the house with a crash.']],
+  ['itinerant','Which sentence uses "itinerant" correctly?','The itinerant pedlar never stayed in one town for long.',['The itinerant oak tree had stood there for centuries.','She stayed itinerant at home all week.','The itinerant rock never moved.']],
+  ['gumption','Which sentence uses "gumption" correctly?','It took gumption to climb the tower alone.',['She chewed a piece of gumption.','The gumption fell off the shelf.','He poured gumption into the teapot.']],
+  ['inaugural','Which sentence uses "inaugural" correctly?','The inaugural meeting of the chess club was held on Monday.',['This is the inaugural time I have told you to stop!','The inaugural cake was eaten last.','He arrived inaugural after everyone else.']],
+  ['accompany','Which sentence uses "accompany" correctly?','The fox will accompany the princess on her journey.',['The princess accompanied the castle alone.','We accompany the sandwich for lunch.','He accompanied his homework into the bin.']],
+  ['conscience','Which sentence uses "conscience" (not "conscious") correctly?','A guilty conscience kept him awake all night.',['After the fall, he was not conscience.','She was conscience of someone behind her.','Be conscience of the step.']],
+  ['according','Which sentence uses "according" correctly?','According to the weather forecast, it will snow tomorrow.',['She according the piano beautifully.','The according was too loud.','He ran according the field.']],
+];
+/* Grammar: which word in the sentence is a ___ */
+const GRAM = [
+  ['The tired knight rode slowly through the forest.','adverb','slowly',['tired','knight','rode']],
+  ['The clever fox hid behind the barn.','adjective','clever',['fox','hid','behind']],
+  ['She whispered the secret to the owl.','pronoun','She',['whispered','secret','owl']],
+  ['The dragon roared at the frightened villagers.','verb','roared',['dragon','frightened','villagers']],
+  ['Princess Ava opened the enormous chest.','noun','chest',['opened','enormous','the']],
+  ['They quickly climbed the tall tower.','adverb','quickly',['They','climbed','tall']],
+  ['The wise owl gave advice.','adjective','wise',['owl','gave','advice']],
+  ['We found a golden key under the rug.','pronoun','We',['found','golden','under']],
+  ['The giant lumbered across the bridge.','verb','lumbered',['giant','across','bridge']],
+  ['Happily, the travellers reached the castle.','adverb','Happily',['travellers','reached','castle']],
+  ['The curious kitten chased a butterfly.','noun','butterfly',['curious','chased','a']],
+  ['The eerie wind howled loudly.','adjective','eerie',['wind','howled','loudly']],
+  ['He bravely faced the witch.','adverb','bravely',['He','faced','witch']],
+  ['The mischievous elves hid the boots.','verb','hid',['mischievous','elves','boots']],
+];
+/* Spot the feature: which of these is a simile / dialogue / fable */
+const SPOT = [
+  ['simile','Which of these is a simile?','Her eyes sparkled like stars.',['Her eyes were stars.','Her eyes sparkled brightly.','She had bright, sparkling eyes.']],
+  ['simile','Which of these is a simile?','The giant was as tall as a tree.',['The giant was very tall.','The giant was a walking tree.','The tall giant stomped away.']],
+  ['simile','Which of these is a simile?','The witch cackled like a hen.',['The witch cackled loudly.','The witch was a cackling hen.','A hen cackled near the witch.']],
+  ['dialogue','Which of these is dialogue?','"Follow me," whispered the fox.',['The fox crept through the trees.','It was a dark and stormy night.','The tower was tall and grey.']],
+  ['dialogue','Which of these is dialogue?','"Who goes there?" called the guard.',['The guard stood by the gate.','Somebody was coming up the path.','The guard wondered who it was.']],
+  ['fable','Which of these is most likely to be a fable?','The Fox and the Grapes: a short animal tale with a lesson at the end',['A list of the kings and queens of England','A newspaper report about a football match','Instructions for building a shed']],
+  ['pronoun','Which of these words is a pronoun?','they',['castle','quickly','brave']],
+  ['adjective','Which of these words is an adjective?','eerie',['whirl','certainly','cyclone']],
+  ['adverb','Which of these words is an adverb?','frequently',['frequent','frequency','free']],
+  ['noun','Which of these words is a noun?','inferno',['inert','solemn','wail']],
+  ['verb','Which of these words is a verb?','whirl',['absurd','queue','eerie']],
+];
+
+/* ================= STATE + STORAGE ================= */
+const STORE = 'blocktower-v1';
+let SAVE = { stats: {}, best: 0, name: '', set: 'all', sound: true, run: null };
+try { const s = JSON.parse(localStorage.getItem(STORE) || 'null'); if (s) SAVE = Object.assign(SAVE, s); } catch (e) {}
+function persist() { try { localStorage.setItem(STORE, JSON.stringify(SAVE)); } catch (e) {} }
+function stat(k) { return SAVE.stats[k] || (SAVE.stats[k] = { r: 0, w: 0 }); }
+
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LET = 'ABCDE';
+
+function active() { return SAVE.set === 'all' ? WORDS : WORDS.filter(w => w.set === SAVE.set); }
+function inSet(word) { const w = BY[word]; return !w || SAVE.set === 'all' || w.set === SAVE.set; }
+
+/* weighted choice: words you got wrong come back more often */
+let recent = [];
+function weightOf(k) { const s = SAVE.stats[k]; if (!s) return 1.4; return Math.max(0.35, 1 + s.w * 2.5 - Math.min(s.r, 5) * 0.15); }
+function pickWeighted(items, keyFn) {
+  let pool = items.filter(it => !recent.includes(keyFn(it)));
+  if (pool.length < 3) pool = items;
+  const ws = pool.map(it => weightOf(keyFn(it)));
+  let t = Math.random() * ws.reduce((a, b) => a + b, 0);
+  for (let i = 0; i < pool.length; i++) { t -= ws[i]; if (t <= 0) return pool[i]; }
+  return pool[pool.length - 1];
+}
+function remember(k) { recent.push(k); if (recent.length > 14) recent.shift(); }
+
+function poolFor(w) {
+  const same = p => p === w.pos || (w.pos === 'num' && p === 'a') || (w.pos === 'adv' && p === 'adv');
+  return WORDS.filter(x => x !== w && same(x.pos) && !(w.group && x.group === w.group) && x.form !== w.form);
+}
+function distractors(w, n, field) {
+  const seen = new Set([w[field]]);
+  const act = new Set(active());
+  let cands = shuffle(poolFor(w)).sort((a, b) => (act.has(b) ? 1 : 0) - (act.has(a) ? 1 : 0));
+  const out = [];
+  for (const c of cands) { if (out.length >= n) break; if (!seen.has(c[field])) { seen.add(c[field]); out.push(c[field]); } }
+  for (const c of shuffle(WORDS)) { if (out.length >= n) break; if (c !== w && !(w.group && c.group === w.group) && !seen.has(c[field])) { seen.add(c[field]); out.push(c[field]); } }
+  return out;
+}
+function build(right, wrongs) { const opts = shuffle([right, ...wrongs]); return { options: opts, answer: opts.indexOf(right) }; }
+
+/* ================= QUESTION MAKERS ================= */
+const MAKE = {
+  def(n) {
+    const w = pickWeighted(active(), x => x.word);
+    return Object.assign(build(w.def, distractors(w, n - 1, 'def')), {
+      key: w.word, label: 'Closest meaning',
+      prompt: `Which of these is closest in meaning to the word <b class="target">${esc(w.word)}</b>?`,
+      explain: `<b>${esc(w.word)}</b> means ${esc(w.def)}.`, ex: w.sent.replace('___', w.form) });
+  },
+  word(n) {
+    const w = pickWeighted(active(), x => x.word);
+    return Object.assign(build(w.word, distractors(w, n - 1, 'word')), {
+      key: w.word, label: 'Find the word',
+      prompt: `Which word means <b class="target">${esc(w.def)}</b>?`,
+      explain: `<b>${esc(w.word)}</b> means ${esc(w.def)}.`, ex: w.sent.replace('___', w.form) });
+  },
+  cloze(n) {
+    const w = pickWeighted(active(), x => x.word);
+    const s = esc(w.sent).replace('___', '<span class="blank">&nbsp;</span>');
+    return Object.assign(build(w.form, distractors(w, n - 1, 'form')), {
+      key: w.word, label: 'Complete the sentence',
+      prompt: `Choose the word that best completes the sentence.<span class="sentence">${s}</span>`,
+      explain: `<b>${esc(w.form)}</b> means ${esc(w.def)}.`, ex: w.sent.replace('___', w.form) });
+  },
+  opp() {
+    const items = OPP.filter(o => inSet(o[0])); if (!items.length) return null;
+    const o = pickWeighted(items, x => 'opp:' + x[0]);
+    return Object.assign(build(o[1], o[2]), {
+      key: o[0], skey: 'opp:' + o[0], label: 'Opposite',
+      prompt: `Which word or phrase is most nearly <u>opposite</u> in meaning to <b class="target">${esc(o[0])}</b>?`,
+      explain: `<b>${esc(o[0])}</b> means ${esc(BY[o[0]]?.def || '')}, so the opposite is <b>${esc(o[1])}</b>.` });
+  },
+  odd() {
+    const items = ODD.filter(o => inSet(o[0])); if (!items.length) return null;
+    const o = pickWeighted(items, x => 'odd:' + x[0] + x[1]);
+    const why = o[0] === 'simile' ? 'Noun, verb and adverb are all word classes. A simile is a comparison.' : `<b>${esc(o[2].join(', '))}</b> all mean much the same. <b>${esc(o[1])}</b> does not.`;
+    return Object.assign(build(o[1], o[2]), {
+      key: BY[o[0]] ? o[0] : null, skey: 'odd:' + o[0] + o[1], label: 'Odd one out',
+      prompt: `Three of these words are similar in meaning. Which is the <u>odd one out</u>?`, explain: why });
+  },
+  use() {
+    const items = USE.filter(o => inSet(o[0])); if (!items.length) return null;
+    const o = pickWeighted(items, x => 'use:' + x[2]);
+    return Object.assign(build(o[2], o[3]), {
+      key: o[0], skey: 'use:' + o[2], label: 'Use the word', prompt: esc(o[1]),
+      explain: `<b>${esc(o[0].replace(/ \(.*\)/, ''))}</b>: ${esc(BY[o[0]]?.def || '')}.` });
+  },
+  gram() {
+    if (SAVE.set === 'spell') return null;
+    if (Math.random() < 0.45) {
+      const o = pickWeighted(SPOT, x => 'spot:' + x[2]);
+      return Object.assign(build(o[2], o[3]), {
+        key: o[0], skey: 'spot:' + o[2], label: 'Grammar', prompt: esc(o[1]),
+        explain: `A <b>${o[0]}</b> is ${esc(BY[o[0]].def)}.` });
+    }
+    const g = pickWeighted(GRAM, x => 'gram:' + x[0]);
+    const art = /^[aeiou]/.test(g[1]) ? 'an' : 'a';
+    return Object.assign(build(g[2], g[3]), {
+      key: g[1], skey: 'gram:' + g[0], label: 'Grammar',
+      prompt: `Which word in this sentence is ${art} <b class="target">${g[1]}</b>?<span class="sentence">${esc(g[0])}</span>`,
+      explain: `<b>${esc(g[2])}</b> is ${art} ${g[1]}: ${esc(BY[g[1]].def)}.` });
+  },
+};
+function makeQuestion(types, n) {
+  for (let tries = 0; tries < 8; tries++) {
+    const t = types[Math.floor(Math.random() * types.length)];
+    const q = MAKE[t](n);
+    if (q) { q.type = t; remember(q.skey || q.key); return q; }
+  }
+  const q = MAKE.def(n); q.type = 'def'; return q;
+}
+
+/* ================= PIXEL SPRITES ================= */
+function sprite(map, pal, px) {
+  const rows = map.trim().split('\n').map(r => r.trim());
+  const h = rows.length, w = rows[0].length; let r = '';
+  rows.forEach((row, y) => [...row].forEach((c, x) => { if (pal[c]) r += `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${pal[c]}"/>`; }));
+  return `<svg class="sprite" viewBox="0 0 ${w} ${h}" width="${w * px}" height="${h * px}" aria-hidden="true">${r}</svg>`;
+}
+const SPR = {
+  fox: [`
+..o.......o.
+.ooo.....ooo
+.oPo.....oPo
+.ooooooooooo
+oooooooooooo
+ooKKooooKKoo
+oooowwwwoooo
+.oowwwKwwoo.
+..wwwwwwww..
+...wwwwww...
+....wwww....`, { o: '#e8792b', P: '#7a3b14', K: '#1b1b1b', w: '#fbf4e8' }],
+  witch: [`
+......kk......
+.....kkkk.....
+....kkkkkk....
+...kkkpppkk...
+..kkkkkkkkkk..
+kkkkkkkkkkkkkk
+....gggggg....
+....gKggKg....
+....gggggg....
+.....gnng.....
+...pppppppp...
+..pppppppppp..
+..ppgppppgpp..
+..pppppppppp..
+...pp....pp...`, { k: '#1c1626', p: '#6b3fa0', g: '#6fbf4a', K: '#ffe14d', n: '#3f7d2a' }],
+  key: [`
+..gggg..
+.gg..gg.
+.gg..gg.
+..gggg..
+...gg...
+...gg...
+...ggg..
+...gg...
+...ggg..`, { g: '#f4c94e' }],
+  book: [`
+rrrrrrr.
+rwwwwwwr
+rwrrrrwr
+rwwwwwwr
+rwrrrwwr
+rwwwwwwr
+rwwwwwwr
+rrrrrrr.`, { r: '#8a3cc4', w: '#f3e7c6' }],
+  potion: [`
+...ww...
+...cc...
+..g..g..
+.gppppg.
+gppPpppg
+gpppppPg
+gppppppg
+.gggggg.`, { w: '#c8a26b', c: '#7a5230', g: '#bfe8ff', p: '#e0413f', P: '#ffb3b3' }],
+  mirror: [`
+..gggg..
+.gbbbbg.
+gbbwbbbg
+gbwbbbbg
+gbbbbbbg
+.gbbbbg.
+..gggg..
+...gg...
+..gggg..`, { g: '#f4c94e', b: '#7fd6ff', w: '#ffffff' }],
+  gem: [`
+..cccc..
+.cwcccc.
+cccccccc
+.cccccc.
+..cccc..
+...cc...`, { c: '#4de0e8', w: '#ffffff' }],
+  crown: [`
+g..g..g.
+gg.gg.gg
+gggggggg
+grgbgrgg
+gggggggg`, { g: '#f4c94e', r: '#e0413f', b: '#4de0e8' }],
+  emerald: [`
+.ee.
+eEee
+eeee
+.ee.`, { e: '#2fcf78', E: '#bfffd8' }],
+  heart: [`
+.rr.rr.
+rrrrrrr
+rWrrrrr
+rrrrrrr
+.rrrrr.
+..rrr..
+...r...`, { r: '#e0413f', W: '#ffb3b3' }],
+  heartE: [`
+.kk.kk.
+kkkkkkk
+kkkkkkk
+kkkkkkk
+.kkkkk.
+..kkk..
+...k...`, { k: '#24272f' }],
+  clock: [`
+.gggg.
+gwwwwg
+gwwkwg
+gwkkwg
+gwwwwg
+.gggg.`, { g: '#2fcf78', w: '#f3e7c6', k: '#1b1b1b' }],
+  dragon: [`
+..........rr..
+.........rrrr.
+........rrKrrr
+.r.....rrrrrr.
+rrr...rrrrr...
+.rrrrrrrrrr...
+..rrryyyrrr...
+...rrrrrrrr...
+...rr....rr...`, { r: '#b8323a', K: '#ffe14d', y: '#f4a64e' }],
+  spider: [`
+k......k
+.k.kk.k.
+..kkkk..
+kkkRRkkk
+..kkkk..
+.k.kk.k.
+k......k`, { k: '#1b1b1b', R: '#e0413f' }],
+  torch: [`
+.oy.
+oyyo
+.oo.
+.ww.
+.ww.
+.ww.`, { o: '#f48a2b', y: '#ffe14d', w: '#7a5230' }],
+  cauldron: [`
+..g.g.gg..
+.gggggggg.
+kkkkkkkkkk
+.kkkkkkkk.
+.kkkkkkkk.
+..kkkkkk..
+..k....k..`, { g: '#7cff6b', k: '#2b2b33' }],
+  tower: [`
+s.s.s.s
+sssssss
+sswsssw
+sssssss
+ssssyss
+sssssss
+swsssss
+sssssss
+sssddss
+sssddss`, { s: '#6b7080', w: '#1a1d3a', y: '#ffe14d', d: '#7a5230' }],
+};
+const S = (name, px) => sprite(SPR[name][0], SPR[name][1], px);
+
+/* ================= ROOMS ================= */
+const ROOMS = [
+  { name: 'The Dungeon Cell', floor: 'Floor 6 of 6, the very top', a: '#2c3140', b: '#151821', ft: '#6b7080', fl: '#3b404d',
+    types: ['def', 'word', 'def', 'word', 'cloze'], goal: 8, item: 'key', itemName: 'Iron Key',
+    intro: n => `You wake up on a pile of straw. Hexabel the witch has locked you in the top of her Enchanted Block Tower! A small orange fox squeezes through the bars. "I'm Pip," he whispers. "I'll be your companion. The lock on this door is enchanted. It only opens for someone who knows what words mean. Get 8 right and it will click open."`,
+    done: 'The iron lock clanks open. Pip finds an Iron Key hidden in the straw.', props: () => S('torch', 6), deco: () => `<div class="deco" style="right:90px;bottom:26px">${S('torch', 5)}</div>` },
+  { name: 'The Cobweb Library', floor: 'Floor 5', a: '#3d2b1f', b: '#1e140d', ft: '#8a5a35', fl: '#5a3a22',
+    types: ['cloze', 'cloze', 'word', 'def'], goal: 9, item: 'book', itemName: 'Spellbook',
+    intro: n => `Down the spiral stairs is a dusty library. Every book is wrapped in sticky webs. "The spiders guard the way out," says Pip. "Finish their sentences and they'll let us pass. Choose the word that fits best."`,
+    done: 'The spiders scuttle away. A glowing Spellbook falls from the top shelf.', props: () => S('spider', 6), deco: () => `<div class="deco bob" style="right:120px;top:12px">${S('spider', 4)}</div>` },
+  { name: 'The Bubbling Potion Room', floor: 'Floor 4', a: '#2d1f45', b: '#130c22', ft: '#7a5aa8', fl: '#45306a',
+    types: ['def', 'cloze', 'gram', 'word', 'gram'], goal: 9, item: 'potion', itemName: 'Potion of Courage',
+    intro: n => `Green smoke curls from a huge cauldron. Hexabel's potions are labelled in riddles. "Answer the riddles and we can brew a Potion of Courage," says Pip. "Watch out: some of these are grammar riddles!"`,
+    done: 'The cauldron glows red. You fill a bottle with the Potion of Courage.', props: () => S('cauldron', 6), deco: () => '' },
+  { name: 'The Hall of Mirrors', floor: 'Floor 3', a: '#1d3a4a', b: '#0d1c26', ft: '#7fbcd6', fl: '#3e6f86',
+    types: ['opp', 'odd', 'use', 'opp', 'odd', 'word'], goal: 10, item: 'mirror', itemName: 'Mirror Shard',
+    intro: n => `A long hall lined with magic mirrors. Everything here is back to front. "The mirrors love opposites and odd ones out," Pip warns. "Think carefully before you answer."`,
+    done: 'One mirror cracks and a silver Mirror Shard falls into your hand.', props: () => S('mirror', 6), deco: () => `<div class="deco" style="right:100px;bottom:26px;opacity:.5">${S('mirror', 5)}</div>` },
+  { name: "The Sleeping Dragon's Vault", floor: 'Floor 2', a: '#4a2a12', b: '#1f1006', ft: '#d9a441', fl: '#8a5a1e',
+    types: ['def', 'word', 'cloze', 'opp', 'odd', 'use', 'gram'], goal: 10, item: 'gem', itemName: 'Dragon Diamond',
+    intro: n => `Mountains of gold glitter in the dark. A dragon snores on top of the pile. "Shh!" says Pip. "Every wrong answer makes it stir. Every right answer gets us closer to the diamond."`,
+    done: 'The dragon rolls over and keeps snoring. You tiptoe out with the Dragon Diamond.', props: () => S('dragon', 6), deco: () => `<div class="deco" style="right:150px;bottom:26px">${S('gem', 4)}</div>` },
+  { name: 'The Drawbridge', floor: 'Ground floor', a: '#24305c', b: '#0e1430', ft: '#5fae3c', fl: '#7a5230', boss: true,
+    types: ['def', 'word', 'cloze', 'opp', 'odd', 'use', 'gram'], goal: 12, item: 'crown', itemName: 'Crown of Words',
+    intro: n => `The drawbridge is in sight, but Hexabel blocks the way! "You'll never escape, ${n}!" she cackles. She is your nemesis. "Every right answer is a spell against her," says Pip. "Hit her 12 times to break her magic!"`,
+    done: 'Hexabel shrieks and vanishes in a puff of purple smoke. The drawbridge thunders down!', props: () => S('witch', 6), deco: () => '' },
+];
+const PIP_GOOD = ['Brilliant!', 'You\'re a word wizard!', 'Spot on!', 'Yes! Keep going!', 'Super!', 'The lock is wobbling!', 'Marvellous!', 'Pip does a happy flip!', 'Excellent!', 'Clever clogs!'];
+const PIP_BAD = ['Ooh, close one. Read the meaning carefully.', 'Don\'t worry, we\'ll see that word again.', 'Tricky one! Say the sentence in your head.', 'Keep calm. You\'ve got this.', 'Have a look at the right answer, then try the next.'];
+const PIP_TIPS = ['Tip: read every option before you choose.', 'Tip: try each word in the sentence.', 'Tip: cross out the ones you know are wrong.', 'Tip: press A to E on a keyboard.', 'Tip: words you miss come back more often.'];
+const rand = a => a[Math.floor(Math.random() * a.length)];
+
+/* ================= SOUND ================= */
+let AC = null;
+function beep(seq) {
+  if (!SAVE.sound) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    let t = AC.currentTime;
+    for (const [f, d, type] of seq) {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type || 'square'; o.frequency.value = f; g.gain.setValueAtTime(0.07, t); g.gain.exponentialRampToValueAtTime(0.001, t + d);
+      o.connect(g).connect(AC.destination); o.start(t); o.stop(t + d); t += d * 0.8;
+    }
+  } catch (e) {}
+}
+const SND = { good: () => beep([[660, .08], [880, .12]]), bad: () => beep([[200, .18, 'sawtooth']]), win: () => beep([[523, .1], [659, .1], [784, .1], [1046, .25]]), tick: () => beep([[1200, .03]]) };
+
+function burst(el, color) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = el.getBoundingClientRect();
+  for (let i = 0; i < 12; i++) {
+    const d = document.createElement('div'); d.className = 'fx';
+    d.style.left = (r.left + r.width / 2) + 'px'; d.style.top = (r.top + r.height / 2) + 'px';
+    d.style.background = color || (i % 2 ? '#2fcf78' : '#f4c94e');
+    d.style.setProperty('--dx', (Math.random() * 220 - 110) + 'px'); d.style.setProperty('--dy', (Math.random() * -160 - 20) + 'px');
+    document.body.appendChild(d); setTimeout(() => d.remove(), 950);
+  }
+}
+
+/* ================= SCREENS ================= */
+const SCREENS = ['s-title', 's-story', 's-play', 's-cleared', 's-win', 's-quick', 's-qend', 's-book'];
+function show(id) { SCREENS.forEach(s => $(s).hidden = s !== id); window.scrollTo(0, 0); }
+function heroName() { return (SAVE.name || '').trim() || 'Adventurer'; }
+
+/* ---------- Title ---------- */
+function initTitle() {
+  $('titleArt').innerHTML = S('fox', 6) + S('tower', 12) + S('witch', 5);
+  $('icoKey').innerHTML = S('key', 5); $('icoClock').innerHTML = S('clock', 7); $('icoBook').innerHTML = S('book', 5);
+  $('heroName').value = SAVE.name || '';
+  $('heroName').addEventListener('input', e => { SAVE.name = e.target.value; persist(); });
+  document.querySelectorAll('#setChips .chip').forEach(c => c.addEventListener('click', () => { SAVE.set = c.dataset.set; persist(); refreshTitle(); }));
+  refreshTitle();
+}
+function refreshTitle() {
+  document.querySelectorAll('#setChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.set === SAVE.set)));
+  $('setCount').textContent = `${active().length} words ready to test.`;
+  const run = SAVE.run;
+  if (run && run.room > 0 && run.room < ROOMS.length) { $('continueNote').hidden = false; $('continueNote').textContent = `Saved game: you reached ${ROOMS[run.room].name}. Escape Room will carry on from there.`; }
+  else $('continueNote').hidden = true;
+}
+
+/* ---------- Escape room ---------- */
+let RUN = null, CUR = null, LOCKED = false;
+function newRun() { return { room: 0, hearts: 5, emeralds: 0, streak: 0, bestStreak: 0, answered: 0, correct: 0, progress: 0, items: [] }; }
+function startEscape() {
+  RUN = (SAVE.run && SAVE.run.room < ROOMS.length) ? SAVE.run : newRun();
+  SAVE.run = RUN; persist(); recent = [];
+  storyFor(RUN.room);
+}
+function sceneHTML(room, bubble) {
+  return `<div class="room-name">${esc(room.name)}</div><div class="room-floor">${esc(room.floor)}</div>${room.deco()}
+    <div class="pip bob">${S('fox', 5)}</div>${bubble ? `<div class="bubble" id="bubble">${esc(bubble)}</div>` : ''}<div class="prop">${room.props()}</div>`;
+}
+function paintScene(el, room) { el.style.setProperty('--room-a', room.a); el.style.setProperty('--room-b', room.b); el.style.setProperty('--floor-top', room.ft); el.style.setProperty('--floor', room.fl); }
+function invHTML() {
+  return ROOMS.map(r => `<div class="slot ${RUN.items.includes(r.item) ? '' : 'empty'}" title="${esc(r.itemName)}">${S(r.item, 4)}</div>`).join('');
+}
+function storyFor(i) {
+  const room = ROOMS[i];
+  paintScene($('storyScene'), room); $('storyScene').innerHTML = sceneHTML(room, null);
+  $('storyTitle').textContent = room.name;
+  $('storyText').textContent = room.intro(heroName());
+  $('storyInv').innerHTML = invHTML();
+  $('storyGo').textContent = room.boss ? 'Face the witch' : 'Enter the room';
+  show('s-story');
+}
+function enterRoom() {
+  const room = ROOMS[RUN.room];
+  paintScene($('scene'), room);
+  $('scene').innerHTML = sceneHTML(room, rand(PIP_TIPS));
+  show('s-play'); nextQ();
+}
+function renderHud() {
+  $('hearts').innerHTML = Array.from({ length: 5 }, (_, i) => S(i < RUN.hearts ? 'heart' : 'heartE', 3)).join('');
+  $('emeralds').innerHTML = S('emerald', 5) + ' ' + RUN.emeralds;
+  $('streak').textContent = RUN.streak >= 2 ? `Streak ${RUN.streak}` : '';
+  $('soundBtn').textContent = 'Sound: ' + (SAVE.sound ? 'on' : 'off');
+  const room = ROOMS[RUN.room];
+  $('lockLbl').textContent = room.boss ? "Hexabel's magic" : 'Door lock';
+  $('cells').innerHTML = Array.from({ length: room.goal }, (_, i) => room.boss
+    ? `<span class="cell boss ${i < RUN.progress ? 'off' : ''}"></span>`
+    : `<span class="cell ${i < RUN.progress ? 'on' : ''}"></span>`).join('');
+}
+function say(t) { const b = $('bubble'); if (b) b.textContent = t; }
+function nextQ() {
+  const room = ROOMS[RUN.room];
+  CUR = makeQuestion(room.types, 5);
+  LOCKED = false; renderHud();
+  $('qpage').innerHTML = `
+    <div class="qmeta"><span class="qtype">${CUR.label}</span><span>Question ${RUN.answered + 1}</span></div>
+    <p class="prompt">${CUR.prompt}</p>
+    <div class="opts">${CUR.options.map((o, i) => `<button class="opt" data-i="${i}"><span class="key">${LET[i]}</span><span>${esc(o)}</span></button>`).join('')}</div>
+    <div id="fb"></div>`;
+  $('qpage').querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => answer(+b.dataset.i)));
+}
+function record(q, ok) {
+  [q.key, q.skey].filter(Boolean).forEach(k => { const s = stat(k); ok ? s.r++ : s.w++; });
+}
+function answer(i) {
+  if (LOCKED) return; LOCKED = true;
+  const ok = i === CUR.answer, room = ROOMS[RUN.room];
+  const btns = [...$('qpage').querySelectorAll('.opt')];
+  btns.forEach((b, j) => { b.disabled = true; if (j === CUR.answer) b.classList.add('right'); else if (j === i) b.classList.add('wrong'); else b.classList.add('faded'); });
+  RUN.answered++; record(CUR, ok);
+  let extra = '';
+  if (ok) {
+    RUN.correct++; RUN.streak++; RUN.bestStreak = Math.max(RUN.bestStreak, RUN.streak); RUN.progress++;
+    RUN.emeralds += 1; if (RUN.streak % 3 === 0) { RUN.emeralds += 2; extra = ` Streak bonus: +2 emeralds!`; }
+    if (RUN.streak % 5 === 0 && RUN.hearts < 5) { RUN.hearts++; extra += ' Pip found you a heart!'; }
+    SND.good(); burst(btns[CUR.answer]); say(rand(PIP_GOOD));
+  } else {
+    RUN.streak = 0; RUN.hearts--; SND.bad(); $('qpage').classList.remove('shake'); void $('qpage').offsetWidth; $('qpage').classList.add('shake');
+    if (RUN.hearts <= 0) {
+      const lost = Math.ceil(RUN.progress / 2); RUN.progress -= lost; RUN.hearts = 5;
+      extra = room.boss ? ` Hexabel's spell knocked you down! Pip gave you a Potion of Healing, but the witch got ${lost} magic back.` : ` Out of hearts! Pip gave you a Potion of Healing, but the lock reset by ${lost}.`;
+      say('Up you get! Hearts refilled.');
+    } else say(rand(PIP_BAD));
+  }
+  persist(); renderHud();
+  const cleared = RUN.progress >= room.goal;
+  $('fb').innerHTML = `<div class="feedback ${ok ? '' : 'bad'}">
+      <p class="verdict">${ok ? 'Correct!' : 'Not quite.'} ${ok ? '+1 emerald' : ''}</p>
+      <p>${ok ? '' : `The answer is <b>${LET[CUR.answer]}: ${esc(CUR.options[CUR.answer])}</b>. `}${CUR.explain}${CUR.ex ? ` <i>${esc(CUR.ex)}</i>` : ''}${esc(extra)}</p>
+      <div class="row"><span class="hint-key">Press Enter or tap the button</span><button class="block-btn grass small" id="nextBtn">${cleared ? (room.boss ? 'Break the spell!' : 'Open the door!') : 'Next question'}</button></div>
+    </div>`;
+  $('nextBtn').addEventListener('click', () => cleared ? clearRoom() : nextQ());
+  $('nextBtn').focus({ preventScroll: true });
+  $('fb').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+function clearRoom() {
+  const room = ROOMS[RUN.room];
+  if (!RUN.items.includes(room.item)) RUN.items.push(room.item);
+  RUN.emeralds += 5; SND.win();
+  const last = RUN.room === ROOMS.length - 1;
+  RUN.room++; RUN.progress = 0; RUN.hearts = Math.min(5, RUN.hearts + 2);
+  persist();
+  if (last) return win();
+  $('clearTitle').textContent = room.name + ' cleared!';
+  $('clearLoot').innerHTML = S(room.item, 9) + S('fox', 6);
+  $('clearText').textContent = `${room.done} You found the ${room.itemName} and 5 bonus emeralds. You also got 2 hearts back.`;
+  $('clearInv').innerHTML = invHTML();
+  show('s-cleared'); setTimeout(() => burst($('clearLoot')), 100);
+}
+function win() {
+  const r = RUN;
+  const room = ROOMS[ROOMS.length - 1];
+  paintScene($('winScene'), room);
+  $('winScene').innerHTML = `<div class="room-name">Free at last!</div><div class="room-floor">The drawbridge is down</div><div class="pip bob">${S('fox', 5)}</div><div class="prop">${S('crown', 8)}</div>`;
+  $('winName').textContent = heroName() + ', Word Wizard';
+  $('winText').textContent = `Escaped from Hexabel's Enchanted Block Tower and crowned with the Crown of Words. Pip the fox is very proud.`;
+  const acc = r.answered ? Math.round(100 * r.correct / r.answered) : 0;
+  $('winStats').innerHTML = [[r.answered, 'questions answered'], [acc + '%', 'accuracy'], [r.emeralds, 'emeralds'], [r.bestStreak, 'best streak']].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('');
+  SAVE.run = null; persist();
+  show('s-win'); setTimeout(() => { burst($('winName'), '#a77ce0'); burst($('winName')); }, 150);
+}
+
+/* ---------- Quick fire ---------- */
+let QF = null;
+function startQuick() {
+  recent = [];
+  QF = { score: 0, combo: 0, bestCombo: 0, answered: 0, time: 60, missed: [], timer: null, locked: false };
+  show('s-quick'); renderQF(); nextQF();
+  QF.timer = setInterval(() => { QF.time--; renderQF(); if (QF.time <= 5 && QF.time > 0) SND.tick(); if (QF.time <= 0) endQuick(); }, 1000);
+}
+function renderQF() {
+  $('qfScore').textContent = 'Score ' + QF.score;
+  $('qfCombo').textContent = QF.combo >= 3 ? `Combo x${QF.combo}` : '';
+  $('qfTime').textContent = Math.max(0, QF.time) + 's';
+  $('qfBar').querySelector('i').style.width = Math.max(0, QF.time / 60 * 100) + '%';
+  $('qfBar').classList.toggle('low', QF.time <= 10);
+}
+function nextQF() {
+  const q = makeQuestion(['def', 'word'], 4); QF.q = q; QF.locked = false;
+  const w = BY[q.key];
+  const prompt = q.type === 'def' ? `<div class="qf-word">${esc(w.word)}</div><p class="prompt" style="text-align:center">What does it mean?</p>`
+    : `<p class="prompt" style="text-align:center">Which word means</p><div class="qf-word" style="font-size:1.25rem;font-family:var(--f-read);font-weight:600">${esc(w.def)}</div>`;
+  $('qfPage').innerHTML = `<div class="qmeta"><span class="qtype">Quick fire</span><span>${QF.answered + 1}</span></div>${prompt}
+    <div class="opts">${q.options.map((o, i) => `<button class="opt" data-i="${i}"><span class="key">${LET[i]}</span><span>${esc(o)}</span></button>`).join('')}</div>`;
+  $('qfPage').querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => answerQF(+b.dataset.i)));
+}
+function answerQF(i) {
+  if (QF.locked || QF.time <= 0) return; QF.locked = true;
+  const q = QF.q, ok = i === q.answer; QF.answered++; record(q, ok);
+  const btns = [...$('qfPage').querySelectorAll('.opt')];
+  btns[q.answer].classList.add('right'); if (!ok) btns[i].classList.add('wrong');
+  if (ok) { QF.combo++; QF.bestCombo = Math.max(QF.bestCombo, QF.combo); QF.score += QF.combo >= 5 ? 2 : 1; if (QF.combo % 5 === 0) QF.time += 3; SND.good(); }
+  else { QF.combo = 0; QF.time = Math.max(0, QF.time - 2); SND.bad(); if (!QF.missed.includes(q.key)) QF.missed.push(q.key); }
+  persist(); renderQF();
+  setTimeout(() => { if (QF.time > 0) nextQF(); }, ok ? 350 : 1100);
+}
+function endQuick() {
+  clearInterval(QF.timer); QF.time = 0;
+  const newBest = QF.score > (SAVE.best || 0); if (newBest) { SAVE.best = QF.score; persist(); }
+  $('qendTitle').textContent = newBest ? 'New best score!' : "Time's up!";
+  $('qendStats').innerHTML = [[QF.score, 'score'], [QF.answered, 'answered'], [QF.bestCombo, 'best combo'], [SAVE.best || 0, 'your best']].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join('');
+  $('missedLbl').hidden = !QF.missed.length;
+  $('missedList').innerHTML = QF.missed.map(k => `<div><b>${esc(k)}</b>: ${esc(BY[k].def)}</div>`).join('') || '<div>No mistakes. Amazing!</div>';
+  show('s-qend'); SND.win(); if (newBest) setTimeout(() => burst($('qendTitle')), 100);
+}
+function quitQuick() { if (QF) clearInterval(QF.timer); show('s-title'); refreshTitle(); }
+
+/* ---------- Spellbook ---------- */
+function renderBook() {
+  const q = $('bookSearch').value.trim().toLowerCase();
+  const list = active().filter(w => !q || w.word.toLowerCase().includes(q) || w.def.toLowerCase().includes(q)).slice().sort((a, b) => a.word.localeCompare(b.word));
+  const POS = { n: 'noun', v: 'verb', a: 'adjective', adv: 'adverb', num: 'number', g: 'grammar' };
+  $('bookGrid').innerHTML = list.map(w => { const s = SAVE.stats[w.word]; const weak = s && s.w > s.r;
+    return `<div class="entry ${weak ? 'weak' : ''}"><b>${esc(w.word)} <small>${POS[w.pos]}</small></b><p>${esc(w.def)}</p></div>`; }).join('') || '<p>No words match that search.</p>';
+}
+
+/* ================= WIRING ================= */
+initTitle();
+$('goEscape').addEventListener('click', startEscape);
+$('goQuick').addEventListener('click', startQuick);
+$('goBook').addEventListener('click', () => { $('bookSearch').value = ''; renderBook(); show('s-book'); });
+$('bookSearch').addEventListener('input', renderBook);
+$('bookHome').addEventListener('click', () => { show('s-title'); refreshTitle(); });
+$('storyGo').addEventListener('click', enterRoom);
+$('storyHome').addEventListener('click', () => { show('s-title'); refreshTitle(); });
+$('clearNext').addEventListener('click', () => storyFor(RUN.room));
+$('quitBtn').addEventListener('click', () => { persist(); show('s-title'); refreshTitle(); });
+$('soundBtn').addEventListener('click', () => { SAVE.sound = !SAVE.sound; persist(); renderHud(); });
+$('winAgain').addEventListener('click', () => { SAVE.run = null; startEscape(); });
+$('winHome').addEventListener('click', () => { show('s-title'); refreshTitle(); });
+$('qfQuit').addEventListener('click', quitQuick);
+$('qendAgain').addEventListener('click', startQuick);
+$('qendHome').addEventListener('click', () => { show('s-title'); refreshTitle(); });
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const k = e.key.toUpperCase(); const idx = LET.indexOf(k) >= 0 ? LET.indexOf(k) : ('12345'.indexOf(k));
+  if (!$('s-play').hidden) {
+    if (idx >= 0 && !LOCKED && CUR && idx < CUR.options.length) answer(idx);
+    else if (e.key === 'Enter' && LOCKED && $('nextBtn') && document.activeElement !== $('nextBtn')) $('nextBtn').click();
+  } else if (!$('s-quick').hidden && idx >= 0 && QF && QF.q && idx < QF.q.options.length) answerQF(idx);
+});
+</script>
+</body>
+</html>
