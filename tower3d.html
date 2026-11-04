@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Block Tower 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --gui: #c6c6c6; --gui-ink: #3f3f3f; --gui-lt: #ffffff; --gui-dk: #555555;
@@ -13,7 +13,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #1b1b1b; color: #fff;
-  font-family: 'Pixelify Sans', 'Courier New', monospace; -webkit-user-select: none; user-select: none; touch-action: none; }
+  font-family: 'Lexend', 'Trebuchet MS', 'Segoe UI', Arial, sans-serif; -webkit-user-select: none; user-select: none; touch-action: none; }
 canvas#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 button { font-family: inherit; }
 
@@ -277,6 +277,8 @@ a.mc-btn { display: inline-flex; align-items: center; justify-content: center; t
 .miss { columns: 2 260px; column-gap: 24px; padding-left: 18px; margin: 0; }
 .miss li { break-inside: avoid; margin-bottom: 6px; line-height: 1.4; color: #e8e8e8; }
 .miss b { color: #ffe08a; }
+/* Legibility: one readable font (Lexend) everywhere, titles included. The pixel font made c look like o and Z look like 2. */
+.logo { font-family: 'Lexend', 'Trebuchet MS', 'Segoe UI', Arial, sans-serif; font-weight: 700; letter-spacing: .02em; }
 </style>
 </head>
 <body>

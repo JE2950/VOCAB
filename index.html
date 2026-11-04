@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>body{margin:0}img{max-width:100%}</style>
+<style>body{margin:0}img{max-width:100%}/* Legibility: one readable font (Lexend) everywhere, titles included. The pixel font made c look like o and Z look like 2. */
+.title-card h1 { font-family: var(--f-logo); }
+</style>
 <title>The Enchanted Block Tower</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Lexend:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: a blocky storybook. Stone tower frame, a scene band for each room, and a parchment question page below. One column, phone first. */
 :root {
@@ -32,7 +34,8 @@
   --text-dim: #b9b6c9;
   --room-a: #2b2f5c;
   --room-b: #1a1d3a;
-  --f-pixel: "Pixelify Sans", "Courier New", monospace;
+  --f-pixel: "Lexend", "Trebuchet MS", system-ui, sans-serif;   /* readable font (was Pixelify Sans) */
+  --f-logo: "Lexend", "Trebuchet MS", system-ui, sans-serif;
   --f-read: "Lexend", "Trebuchet MS", system-ui, sans-serif;
   color-scheme: dark;
 }
