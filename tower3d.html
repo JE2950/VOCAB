@@ -318,6 +318,7 @@ a.mc-btn { display: inline-flex; align-items: center; justify-content: center; t
       <button class="mc-btn small" data-set="all">All words</button>
       <button class="mc-btn small" data-set="spell">Spelling list</button>
       <button class="mc-btn small" data-set="story">Story &amp; grammar words</button>
+      <button class="mc-btn small" data-set="lesson" id="setLesson" hidden>Lesson words</button>
     </div>
     <div class="status" id="setStatus"></div>
   </div>
@@ -1430,9 +1431,19 @@ function winGame() {
 // ════════════════════════════════════════════════════════════════
 const SPLASH = ['Mind the dragon!', 'Shh! The guard is asleep.', 'Hee hee hee!', 'Pip believes in you!', 'Bring a dictionary!'];
 function syncTitle() {
+  const lessons = LESSON.count();
+  $('setLesson').hidden = lessons === 0;
+  $('setLesson').textContent = `Lesson words (${lessons})`;
+  if (SAVE.set === 'lesson' && !lessons) { SAVE.set = 'all'; persist(); }
   document.querySelectorAll('[data-set]').forEach(b => b.classList.toggle('on', b.dataset.set === SAVE.set));
   $('setStatus').textContent = `${active().length} words ready to test.`;
 }
+/* words added in the main game, in another tab, show up here too */
+window.addEventListener('storage', e => {
+  if (e.key !== LESSON_STORE) return;
+  LESSON.refresh();
+  if (mode === 'title') syncTitle();
+});
 function toTitle() {
   mode = 'title'; game = null; cur = null;
   MODE.build(); buildAll(); spawnNpcs(); parts.length = 0;

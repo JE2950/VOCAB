@@ -159,16 +159,198 @@ pronoun||g|a word that takes the place of a noun (he, she, I, you, they)|In "The
 simile||g|a comparison using "like" or "as"|"As brave as a lion" is a(n) ___.|
 dialogue||g|conversation between characters|The words characters say to each other, written in speech marks, are called ___.|`;
 
+/* ================= LESSON WORDS =================
+   Words added live during a lesson. They live in the browser (localStorage),
+   get merged into the word bank below, and can be shared to another device
+   with a #words= link. See LESSON.* for the API the add screen uses. */
+const LESSON_STORE = 'blocktower-lesson-v1';
+const POS_LIST = [['n', 'noun'], ['v', 'verb'], ['a', 'adjective'], ['adv', 'adverb'], ['num', 'number']];
+const POS_CODES = POS_LIST.map(p => p[0]);
+let EXTRA = [];
+
+function cleanWord(o) {
+  const word = String(o.word || '').trim().replace(/\s+/g, ' ');
+  const def = String(o.def || '').trim();
+  if (!word || !def) return null;
+  let pos = String(o.pos || '').trim().toLowerCase();
+  if (!POS_CODES.includes(pos)) pos = (POS_LIST.find(p => p[1] === pos) || [])[0] || 'n';
+  let sent = String(o.sent || '').trim();
+  const form = String(o.form || '').trim() || word;
+  /* a sentence typed with the word in it becomes a gap-fill automatically */
+  if (sent && !sent.includes('___')) {
+    const re = new RegExp('\\b' + form.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    sent = re.test(sent) ? sent.replace(re, '___') : '';
+  }
+  return { word, form, pos, def, sent, group: String(o.group || '').trim() };
+}
+
+/* ---- paste parsing: Quizlet exports and this file's own line format ---- */
+function posCode(v) {
+  const s = String(v || '').trim().toLowerCase().replace(/\.$/, '');
+  if (!s) return null;
+  if (POS_CODES.includes(s)) return s;
+  const full = POS_LIST.find(p => p[1] === s); if (full) return full[0];
+  const short = { adj: 'a', ad: 'a', vb: 'v', nn: 'n', number: 'num', numeral: 'num' }[s];
+  return short || null;
+}
+/* word class from the word's ending, or from how the meaning opens */
+function guessPos(word, def) {
+  const d = String(def || '').trim().toLowerCase();
+  if (/^to\s/.test(d)) return 'v';
+  if (/^(a|an|the)\s/.test(d)) return 'n';
+  if (/^(the number|number)\b/.test(d)) return 'num';
+  const w = String(word || '').trim().toLowerCase();
+  if (/ly$/.test(w)) return 'adv';
+  if (/(tion|sion|ness|ment|ity|ance|ence|ism|ship|hood|dom|ure|age)$/.test(w)) return 'n';
+  if (/(ous|ful|ive|able|ible|ant|ent|ic|al|less|ish|like|id|ile|ose|ern)$/.test(w)) return 'a';
+  if (/(ise|ize|ify|ate|ish)$/.test(w)) return 'v';
+  return 'n';
+}
+function splitRows(text) {
+  let t = text.replace(/\r\n?/g, '\n').trim();
+  if (!t) return [];
+  /* Quizlet can export with a custom row separator instead of a new line */
+  let rows = t.includes('\n') ? t.split('\n') : (t.includes(';;') ? t.split(';;') : t.split('\n'));
+  return rows.map(r => r.trim()).filter(r => r && r[0] !== '#');
+}
+const SEPS = ['\t', ' | ', ' - ', ' – ', ' — ', ' : ', ';', ',', '|', '-', ':', ' '];
+/* pick the separator that splits the most rows cleanly into two or more parts */
+function detectSep(rows) {
+  let best = '\t', score = -1;
+  for (const s of SEPS) {
+    let n = 0;
+    for (const r of rows) {
+      const parts = splitRow(r, s);
+      if (parts.length >= 2 && parts[0].length <= 40) n++;
+    }
+    if (n > score) { score = n; best = s; }
+  }
+  return score > 0 ? best : '\t';
+}
+/* split on the FIRST separator only, so a meaning may contain it too */
+function splitRow(row, sep) {
+  const i = row.indexOf(sep);
+  if (i < 0) return [row.trim()].filter(Boolean);
+  const head = row.slice(0, i).trim(), tail = row.slice(i + sep.length).trim();
+  if (!head || !tail) return [row.trim()].filter(Boolean);
+  return [head, tail];
+}
+
+function readLesson() {
+  let list = [];
+  try { const a = JSON.parse(localStorage.getItem(LESSON_STORE) || '[]'); if (Array.isArray(a)) list = a; } catch (e) {}
+  return list.map(cleanWord).filter(Boolean);
+}
+
 const WORDS = [];
-(() => { let set = 'spell';
+const BY = {};
+function rebuildWords() {
+  WORDS.length = 0;
+  let set = 'spell';
   for (const line of RAW.split('\n')) {
     if (!line.trim()) continue;
     if (line[0] === '#') { set = line.slice(1).trim(); continue; }
     const [word, form, pos, def, sent, group] = line.split('|');
     WORDS.push({ word, form: form || word, pos, def, sent, group: group || '', set });
   }
+  for (const e of EXTRA) {
+    const i = WORDS.findIndex(w => w.word.toLowerCase() === e.word.toLowerCase());
+    /* a lesson word already in the bank overrides it, but keeps its list and
+       anything the new version leaves blank */
+    if (i >= 0) {
+      const filled = {};
+      for (const k of Object.keys(e)) if (e[k]) filled[k] = e[k];
+      WORDS[i] = Object.assign({}, WORDS[i], filled, { lesson: true });
+    } else WORDS.push(Object.assign({}, e, { set: 'lesson', lesson: true }));
+  }
+  for (const k of Object.keys(BY)) delete BY[k];
+  for (const w of WORDS) BY[w.word] = w;
+}
+EXTRA = readLesson();
+rebuildWords();
+
+const LESSON = {
+  list: () => EXTRA.slice(),
+  count: () => EXTRA.length,
+  find: word => EXTRA.find(x => x.word.toLowerCase() === String(word).trim().toLowerCase()) || null,
+  /* add one word; returns 'added', 'updated' or null if it was unusable */
+  add(o) {
+    const w = cleanWord(o); if (!w) return null;
+    const i = EXTRA.findIndex(x => x.word.toLowerCase() === w.word.toLowerCase());
+    const how = i >= 0 ? 'updated' : 'added';
+    if (i >= 0) EXTRA[i] = w; else EXTRA.push(w);
+    LESSON.commit(); return how;
+  },
+  remove(word) {
+    EXTRA = EXTRA.filter(x => x.word.toLowerCase() !== String(word).toLowerCase());
+    LESSON.commit();
+  },
+  clear() { EXTRA = []; LESSON.commit(); },
+  commit() {
+    try { localStorage.setItem(LESSON_STORE, JSON.stringify(EXTRA)); } catch (e) {}
+    rebuildWords();
+  },
+  /* pick up words added in another tab without a reload */
+  refresh() { EXTRA = readLesson(); rebuildWords(); },
+  /* Bulk paste. Handles a Quizlet export (term and meaning in two columns,
+     separated by a tab, dash, comma or semicolon) and this file's own
+     word|form|pos|def|sent|group lines. posHint: a code, or '' to guess. */
+  parsePaste(text, posHint) {
+    const rows = splitRows(String(text));
+    if (!rows.length) return [];
+    const sep = detectSep(rows);
+    const out = [];
+    for (const row of rows) {
+      let o = null;
+      const f = row.split('|').map(s => s.trim());
+      if (f.length >= 5) o = { word: f[0], form: f[1], pos: f[2], def: f[3], sent: f[4], group: f[5] };
+      else if (f.length === 4) o = { word: f[0], pos: f[1], def: f[2], sent: f[3] };
+      else if (f.length === 3) o = posCode(f[1]) ? { word: f[0], pos: f[1], def: f[2] }
+                                                 : { word: f[0], def: f[1], sent: f[2] };
+      else {
+        const p = splitRow(row, sep);
+        if (p.length < 2) continue;
+        o = { word: p[0], def: p[1] };
+      }
+      /* a meaning that opens with a word class, as in "(adj) very old" */
+      const tag = /^[([]\s*([a-z.]{1,10})\s*[)\]]\s*/i.exec(String(o.def || ''));
+      if (tag && posCode(tag[1])) { o.pos = o.pos || tag[1]; o.def = o.def.slice(tag[0].length); }
+      o.pos = posCode(o.pos) || posCode(posHint) || guessPos(o.word, o.def);
+      const w = cleanWord(o); if (w) out.push(w);
+    }
+    return out;
+  },
+  /* lines ready to paste into the RAW block in this file */
+  exportLines() {
+    return EXTRA.map(w => [w.word, w.form === w.word ? '' : w.form, w.pos, w.def, w.sent, w.group].join('|')).join('\n');
+  },
+  /* a link that carries the words to another device */
+  shareLink() {
+    if (!EXTRA.length) return '';
+    const slim = EXTRA.map(w => [w.word, w.form === w.word ? '' : w.form, w.pos, w.def, w.sent, w.group]);
+    const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(slim)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return location.href.split('#')[0] + '#words=' + b64;
+  },
+};
+
+/* a #words= link merges its words in on load */
+(() => {
+  const m = /[#&]words=([A-Za-z0-9\-_]+)/.exec(location.hash); if (!m) return;
+  try {
+    const json = decodeURIComponent(escape(atob(m[1].replace(/-/g, '+').replace(/_/g, '/'))));
+    const rows = JSON.parse(json); if (!Array.isArray(rows)) return;
+    let n = 0;
+    for (const r of rows) {
+      const w = cleanWord({ word: r[0], form: r[1], pos: r[2], def: r[3], sent: r[4], group: r[5] });
+      if (!w) continue;
+      const i = EXTRA.findIndex(x => x.word.toLowerCase() === w.word.toLowerCase());
+      if (i >= 0) EXTRA[i] = w; else EXTRA.push(w);
+      n++;
+    }
+    if (n) { LESSON.commit(); window.LESSON_IMPORTED = n; }
+    history.replaceState(null, '', location.pathname + location.search);
+  } catch (e) {}
 })();
-const BY = Object.fromEntries(WORDS.map(w => [w.word, w]));
 
 /* Opposites: ISEB "most nearly opposite in meaning" */
 const OPP = [
@@ -288,8 +470,17 @@ const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { c
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const LET = 'ABCDE';
 
-function active() { return SAVE.set === 'all' ? WORDS : WORDS.filter(w => w.set === SAVE.set); }
-function inSet(word) { const w = BY[word]; return !w || SAVE.set === 'all' || w.set === SAVE.set; }
+function active() {
+  if (SAVE.set === 'lesson') { const l = WORDS.filter(w => w.lesson); return l.length ? l : WORDS; }
+  return SAVE.set === 'all' ? WORDS : WORDS.filter(w => w.set === SAVE.set);
+}
+function inSet(word) {
+  const w = BY[word]; if (!w || SAVE.set === 'all') return true;
+  if (SAVE.set === 'lesson') return !!w.lesson || !LESSON.count();
+  return w.set === SAVE.set;
+}
+/* example sentence with the word dropped back in, or nothing if there isn't one */
+function example(w) { return w.sent && w.sent.includes('___') ? w.sent.replace('___', w.form) : ''; }
 
 /* weighted choice: words you got wrong come back more often */
 let recent = [];
@@ -326,22 +517,24 @@ const MAKE = {
     return Object.assign(build(w.def, distractors(w, n - 1, 'def')), {
       key: w.word, label: 'Closest meaning',
       prompt: `Which of these is closest in meaning to the word <b class="target">${esc(w.word)}</b>?`,
-      explain: `<b>${esc(w.word)}</b> means ${esc(w.def)}.`, ex: w.sent.replace('___', w.form) });
+      explain: `<b>${esc(w.word)}</b> means ${esc(w.def)}.`, ex: example(w) });
   },
   word(n) {
     const w = pickWeighted(active(), x => x.word);
     return Object.assign(build(w.word, distractors(w, n - 1, 'word')), {
       key: w.word, label: 'Find the word',
       prompt: `Which word means <b class="target">${esc(w.def)}</b>?`,
-      explain: `<b>${esc(w.word)}</b> means ${esc(w.def)}.`, ex: w.sent.replace('___', w.form) });
+      explain: `<b>${esc(w.word)}</b> means ${esc(w.def)}.`, ex: example(w) });
   },
   cloze(n) {
-    const w = pickWeighted(active(), x => x.word);
+    const pool = active().filter(x => x.sent && x.sent.includes('___'));
+    if (!pool.length) return null;
+    const w = pickWeighted(pool, x => x.word);
     const s = esc(w.sent).replace('___', '<span class="blank">&nbsp;</span>');
     return Object.assign(build(w.form, distractors(w, n - 1, 'form')), {
       key: w.word, label: 'Complete the sentence',
       prompt: `Choose the word that best completes the sentence.<span class="sentence">${s}</span>`,
-      explain: `<b>${esc(w.form)}</b> means ${esc(w.def)}.`, ex: w.sent.replace('___', w.form) });
+      explain: `<b>${esc(w.form)}</b> means ${esc(w.def)}.`, ex: example(w) });
   },
   opp() {
     const items = OPP.filter(o => inSet(o[0])); if (!items.length) return null;
@@ -367,7 +560,7 @@ const MAKE = {
       explain: `<b>${esc(o[0].replace(/ \(.*\)/, ''))}</b>: ${esc(BY[o[0]]?.def || '')}.` });
   },
   gram() {
-    if (SAVE.set === 'spell') return null;
+    if (SAVE.set !== 'all' && SAVE.set !== 'story') return null;
     if (Math.random() < 0.45) {
       const o = pickWeighted(SPOT, x => 'spot:' + x[2]);
       return Object.assign(build(o[2], o[3]), {

@@ -123,6 +123,7 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
 .mode.book b { color: var(--amethyst); }
 .mode.tower { text-decoration: none; }
 .mode.tower b { color: #ff9a4d; }
+.mode.forge-mode b { color: #f0b429; }
 .continue-note { font-size: .85rem; color: var(--text-dim); }
 
 /* ---------- HUD ---------- */
@@ -166,6 +167,30 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
 .cell.on { background: var(--gold); box-shadow: inset -3px -3px 0 #b88f23, inset 3px 3px 0 #ffe58f; }
 .cell.boss { background: var(--amethyst); box-shadow: inset -3px -3px 0 var(--amethyst-dk), inset 3px 3px 0 #d3b6ff; }
 .cell.boss.off { background: var(--stone-lo); box-shadow: inset 2px 2px 0 #0007; }
+
+/* ---------- Add words ---------- */
+.forge { display: grid; gap: 14px; }
+.forge .page { gap: 10px; }
+.forge h3 { font-family: var(--f-pixel); font-size: 1.05rem; margin: 0; color: var(--ink); }
+.forge p.help { margin: 0; font-size: .88rem; color: var(--ink-soft); }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fgrid .wide { grid-column: 1 / -1; }
+.fgrid label { display: grid; gap: 4px; font-family: var(--f-pixel); font-size: .8rem; color: var(--ink-soft); letter-spacing: .04em; }
+.forge input[type=text], .forge select, .forge textarea {
+  font: inherit; padding: 10px 12px; border: 0; width: 100%; min-width: 0;
+  background: #fff9; color: var(--ink); box-shadow: inset 3px 3px 0 var(--parch-edge);
+}
+.forge textarea { min-height: 96px; resize: vertical; font-size: .95rem; }
+.forge .btnrow { justify-content: flex-start; }
+.wordlist { display: grid; gap: 6px; max-height: 300px; overflow: auto; }
+.wordrow { display: flex; align-items: baseline; gap: 8px; background: #fff8; padding: 8px 10px; }
+.wordrow b { font-family: var(--f-pixel); font-size: 1.02rem; }
+.wordrow small { color: var(--ink-soft); font-size: .72rem; }
+.wordrow p { margin: 0; font-size: .9rem; flex: 1 1 auto; min-width: 0; }
+.wordrow button { font: inherit; font-size: .8rem; border: 0; cursor: pointer; background: var(--ruby); color: #fff; padding: 4px 9px; }
+.forge .note { font-size: .86rem; margin: 0; padding: 8px 10px; background: var(--ink); color: var(--parch); }
+.forge .note.ok { background: var(--emerald-dk); }
+.share { font: inherit; font-size: .82rem; word-break: break-all; }
 
 /* ---------- Question page ---------- */
 .page {
@@ -274,6 +299,7 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
         <button class="chip" data-set="all" aria-pressed="true">All words</button>
         <button class="chip" data-set="spell" aria-pressed="false">Spelling list</button>
         <button class="chip" data-set="story" aria-pressed="false">Story &amp; grammar words</button>
+        <button class="chip" data-set="lesson" id="chipLesson" aria-pressed="false" hidden>Lesson words</button>
       </div>
       <span class="continue-note" id="setCount"></span>
     </div>
@@ -282,6 +308,7 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
       <button class="mode quick" id="goQuick"><span class="ico" id="icoClock"></span><b>Quick Fire</b><span>60 seconds. How many can you get?</span></button>
       <a class="mode tower" id="go3d" href="tower3d.html"><span class="ico" id="ico3d"></span><b>3D Tower</b><span>Walk through the tower in first person.</span></a>
       <button class="mode book" id="goBook"><span class="ico" id="icoBook"></span><b>Spellbook</b><span>Read every word and meaning.</span></button>
+      <button class="mode forge-mode" id="goForge"><span class="ico" id="icoForge"></span><b>Add Words</b><span>New words mid-lesson. They join the games at once.</span></button>
     </div>
     <p class="continue-note" id="continueNote" hidden></p>
   </section>
@@ -367,6 +394,70 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
     <div class="hud"><h2 style="margin:0;color:var(--amethyst)">Spellbook</h2><button class="icon-btn" id="bookHome">Back</button></div>
     <div class="book-tools"><input type="text" id="bookSearch" placeholder="Search a word or meaning"><span class="legend">Red edge = needs practice</span></div>
     <div class="book-grid" id="bookGrid"></div>
+  </section>
+
+  <!-- ADD WORDS -->
+  <section id="s-forge" class="forge" hidden>
+    <div class="hud"><h2 style="margin:0;color:#f0b429">Add Words</h2><button class="icon-btn" id="forgeHome">Back</button></div>
+
+    <div class="page">
+      <h3>New word</h3>
+      <p class="help">Type a word and its meaning and it joins the games straight away. The example sentence is optional: write <b>___</b> where the word goes, or just use the word and it will be blanked out for you.</p>
+      <div class="fgrid">
+        <label>Word<input type="text" id="fWord" autocomplete="off" spellcheck="false" placeholder="e.g. reluctant"></label>
+        <label>Word class<select id="fPos">
+          <option value="n">noun</option>
+          <option value="v">verb</option>
+          <option value="a" selected>adjective</option>
+          <option value="adv">adverb</option>
+          <option value="num">number</option>
+        </select></label>
+        <label class="wide">Meaning<input type="text" id="fDef" autocomplete="off" placeholder="e.g. unwilling; holding back"></label>
+        <label class="wide">Example sentence (optional)<input type="text" id="fSent" autocomplete="off" placeholder="He gave a ___ nod and followed her inside."></label>
+      </div>
+      <p class="note" id="forgeMsg" hidden></p>
+      <div class="btnrow">
+        <button class="block-btn grass" id="fAdd">Add to the games</button>
+        <span class="legend" id="forgeCount"></span>
+      </div>
+    </div>
+
+    <div class="page">
+      <h3>Lesson words <small style="font-family:var(--f-read);font-weight:400;font-size:.8rem;color:var(--ink-soft)">— tap the cross to remove one</small></h3>
+      <div class="wordlist" id="forgeList"></div>
+    </div>
+
+    <div class="page">
+      <h3>Paste a list</h3>
+      <p class="help">Paste straight from a Quizlet export, a spreadsheet column or a typed list. One word a line, word first and meaning second, split by a tab, dash, comma or semicolon. The word class is worked out for you unless you set it below, or write it yourself as <b>word | adjective | meaning | sentence</b>.</p>
+      <textarea id="fBulk" spellcheck="false" placeholder="reluctant&#9;unwilling; holding back&#10;ominous - suggesting something bad is coming&#10;trudge, to walk slowly with heavy steps"></textarea>
+      <div class="fgrid">
+        <label>Word class for this list<select id="fBulkPos">
+          <option value="" selected>Work it out for me</option>
+          <option value="n">all nouns</option>
+          <option value="v">all verbs</option>
+          <option value="a">all adjectives</option>
+          <option value="adv">all adverbs</option>
+        </select></label>
+      </div>
+      <p class="note" id="forgeBulkMsg" hidden></p>
+      <div class="btnrow">
+        <button class="block-btn" id="fBulkCheck">Check the list</button>
+        <button class="block-btn grass" id="fBulkAdd">Add these words</button>
+      </div>
+      <div class="wordlist" id="fPreview" hidden></div>
+    </div>
+
+    <div class="page">
+      <h3>Share and keep</h3>
+      <p class="help">Lesson words live in this browser. Use the link to put the same words on another device, or copy the lines into <b>words.js</b> to keep them for good.</p>
+      <div class="btnrow">
+        <button class="block-btn small" id="fShare">Copy share link</button>
+        <button class="block-btn small" id="fExport">Copy lines for words.js</button>
+        <button class="block-btn small" id="fClear" style="background:var(--ruby);box-shadow:inset -4px -4px 0 #7d1226,inset 4px 4px 0 #ff6b86,0 4px 0 #0007">Remove all</button>
+      </div>
+      <p class="note ok" id="forgeShare" hidden></p>
+    </div>
   </section>
 </div>
 
@@ -596,20 +687,24 @@ function burst(el, color) {
 }
 
 /* ================= SCREENS ================= */
-const SCREENS = ['s-title', 's-story', 's-play', 's-cleared', 's-win', 's-quick', 's-qend', 's-book'];
+const SCREENS = ['s-title', 's-story', 's-play', 's-cleared', 's-win', 's-quick', 's-qend', 's-book', 's-forge'];
 function show(id) { SCREENS.forEach(s => $(s).hidden = s !== id); window.scrollTo(0, 0); }
 function heroName() { return (SAVE.name || '').trim() || 'Adventurer'; }
 
 /* ---------- Title ---------- */
 function initTitle() {
   $('titleArt').innerHTML = S('fox', 6) + S('tower', 12) + S('witch', 5);
-  $('icoKey').innerHTML = S('key', 5); $('icoClock').innerHTML = S('clock', 7); $('icoBook').innerHTML = S('book', 5); $('ico3d').innerHTML = S('fox', 4);
+  $('icoKey').innerHTML = S('key', 5); $('icoClock').innerHTML = S('clock', 7); $('icoBook').innerHTML = S('book', 5); $('ico3d').innerHTML = S('fox', 4); $('icoForge').innerHTML = S('cauldron', 5);
   $('heroName').value = SAVE.name || '';
   $('heroName').addEventListener('input', e => { SAVE.name = e.target.value; persist(); });
   document.querySelectorAll('#setChips .chip').forEach(c => c.addEventListener('click', () => { SAVE.set = c.dataset.set; persist(); refreshTitle(); }));
   refreshTitle();
 }
 function refreshTitle() {
+  const lessons = LESSON.count();
+  $('chipLesson').hidden = lessons === 0;
+  $('chipLesson').textContent = `Lesson words (${lessons})`;
+  if (SAVE.set === 'lesson' && !lessons) { SAVE.set = 'all'; persist(); }
   document.querySelectorAll('#setChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.set === SAVE.set)));
   $('setCount').textContent = `${active().length} words ready to test.`;
   const run = SAVE.run;
@@ -786,8 +881,97 @@ function renderBook() {
     return `<div class="entry ${weak ? 'weak' : ''}"><b>${esc(w.word)} <small>${POS[w.pos]}</small></b><p>${esc(w.def)}</p></div>`; }).join('') || '<p>No words match that search.</p>';
 }
 
+/* ---------- Add words ---------- */
+const POS_LABEL = { n: 'noun', v: 'verb', a: 'adjective', adv: 'adverb', num: 'number' };
+function say2(id, text, ok) {
+  const el = $(id); el.hidden = !text; el.textContent = text || ''; el.classList.toggle('ok', !!ok);
+}
+function forgeMsg(text, ok) { say2('forgeMsg', text, ok); }
+function bulkMsg(text, ok) { say2('forgeBulkMsg', text, ok); }
+function renderForge() {
+  const list = LESSON.list().slice().sort((a, b) => a.word.localeCompare(b.word));
+  $('forgeList').innerHTML = list.map(w => `<div class="wordrow">
+      <b>${esc(w.word)}</b><small>${POS_LABEL[w.pos] || w.pos}</small>
+      <p>${esc(w.def)}</p>
+      <button data-del="${esc(w.word)}" aria-label="Remove ${esc(w.word)}">&times;</button>
+    </div>`).join('') || '<p class="help">No lesson words yet. Add one above and it appears in every mode.</p>';
+  $('forgeList').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    LESSON.remove(b.dataset.del); renderForge(); forgeMsg(`Removed ${b.dataset.del}.`);
+  }));
+  const n = LESSON.count();
+  $('forgeCount').textContent = n ? `${n} lesson word${n === 1 ? '' : 's'} in play.` : '';
+  $('forgeShare').hidden = true;
+}
+function addFromForm() {
+  const word = $('fWord').value.trim();
+  const def = $('fDef').value.trim();
+  if (!word || !def) { forgeMsg('A word needs a meaning before it can go in the games.'); return; }
+  const how = LESSON.add({ word, pos: $('fPos').value, def, sent: $('fSent').value });
+  if (!how) { forgeMsg('That word could not be added. Check the spelling and meaning.'); return; }
+  const saved = LESSON.find(word);
+  const warn = $('fSent').value.trim() && saved && !saved.sent ? ' The sentence did not contain the word, so it was left out.' : '';
+  forgeMsg(`${word} ${how === 'updated' ? 'updated' : 'added'}. It can come up in the next question.${warn}`, true);
+  $('fWord').value = ''; $('fDef').value = ''; $('fSent').value = '';
+  renderForge(); $('fWord').focus();
+}
+function bulkRows() { return LESSON.parsePaste($('fBulk').value, $('fBulkPos').value); }
+function previewBulk() {
+  const rows = bulkRows();
+  const el = $('fPreview');
+  if (!rows.length) { el.hidden = true; bulkMsg('No usable lines found. Each line needs a word and a meaning next to each other.'); return; }
+  el.hidden = false;
+  el.innerHTML = rows.map(w => `<div class="wordrow"><b>${esc(w.word)}</b><small>${POS_LABEL[w.pos] || w.pos}</small><p>${esc(w.def)}</p></div>`).join('');
+  bulkMsg(`${rows.length} word${rows.length === 1 ? '' : 's'} read. If a word class looks wrong, set it above and check again.`, true);
+}
+function addFromBulk() {
+  const rows = bulkRows();
+  if (!rows.length) { bulkMsg('No usable lines found. Each line needs a word and a meaning next to each other.'); return; }
+  rows.forEach(r => LESSON.add(r));
+  $('fBulk').value = ''; $('fPreview').hidden = true;
+  bulkMsg(`${rows.length} word${rows.length === 1 ? '' : 's'} added. They can come up in the next question.`, true);
+  renderForge();
+}
+async function copyOut(text, label) {
+  const el = $('forgeShare');
+  try { await navigator.clipboard.writeText(text); el.innerHTML = `${label} copied.<br><span class="share">${esc(text)}</span>`; }
+  catch (e) { el.innerHTML = `Copy this by hand:<br><span class="share">${esc(text)}</span>`; }
+  el.hidden = false;
+}
+function openForge() { forgeMsg(''); bulkMsg(''); renderForge(); show('s-forge'); }
+
 /* ================= WIRING ================= */
 initTitle();
+$('goForge').addEventListener('click', openForge);
+$('forgeHome').addEventListener('click', () => { show('s-title'); refreshTitle(); });
+$('fAdd').addEventListener('click', addFromForm);
+$('fBulkAdd').addEventListener('click', addFromBulk);
+$('fBulkCheck').addEventListener('click', previewBulk);
+$('fBulkPos').addEventListener('change', () => { if (!$('fPreview').hidden) previewBulk(); });
+['fWord', 'fDef', 'fSent'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addFromForm(); } }));
+$('fShare').addEventListener('click', () => {
+  const link = LESSON.shareLink();
+  if (!link) { forgeMsg('Add a word first, then there is something to share.'); return; }
+  copyOut(link, 'Share link');
+});
+$('fExport').addEventListener('click', () => {
+  const lines = LESSON.exportLines();
+  if (!lines) { forgeMsg('Add a word first, then there is something to copy.'); return; }
+  copyOut(lines, 'Word lines');
+});
+$('fClear').addEventListener('click', () => {
+  if (!LESSON.count()) return;
+  if (!confirm('Remove every lesson word? The words in words.js are not touched.')) return;
+  LESSON.clear(); renderForge(); forgeMsg('All lesson words removed.');
+});
+/* words added in another tab show up here too */
+window.addEventListener('storage', e => {
+  if (e.key !== LESSON_STORE) return;
+  LESSON.refresh();
+  if (!$('s-forge').hidden) renderForge();
+  if (!$('s-title').hidden) refreshTitle();
+  if (!$('s-book').hidden) renderBook();
+});
+if (window.LESSON_IMPORTED) setTimeout(() => { openForge(); forgeMsg(`${window.LESSON_IMPORTED} shared word${window.LESSON_IMPORTED === 1 ? '' : 's'} added to this device.`, true); }, 0);
 $('goEscape').addEventListener('click', startEscape);
 $('goQuick').addEventListener('click', startQuick);
 $('goBook').addEventListener('click', () => { $('bookSearch').value = ''; renderBook(); show('s-book'); });
@@ -804,7 +988,8 @@ $('qfQuit').addEventListener('click', quitQuick);
 $('qendAgain').addEventListener('click', startQuick);
 $('qendHome').addEventListener('click', () => { show('s-title'); refreshTitle(); });
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
+  if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
+  if (!$('s-forge').hidden) return;
   const k = e.key.toUpperCase(); const idx = LET.indexOf(k) >= 0 ? LET.indexOf(k) : ('12345'.indexOf(k));
   if (!$('s-play').hidden) {
     if (idx >= 0 && !LOCKED && CUR && idx < CUR.options.length) answer(idx);
