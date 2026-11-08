@@ -402,11 +402,12 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
 
     <div class="page">
       <h3>New word</h3>
-      <p class="help">Type a word and its meaning and it joins the games straight away. The example sentence is optional: write <b>___</b> where the word goes, or just use the word and it will be blanked out for you.</p>
+      <p class="help">Type a word and its meaning and it joins the games straight away. Word class and sentence can both be skipped: a word with no class set draws its wrong answers from any class. The example sentence is optional: write <b>___</b> where the word goes, or just use the word and it will be blanked out for you.</p>
       <div class="fgrid">
         <label>Word<input type="text" id="fWord" autocomplete="off" spellcheck="false" placeholder="e.g. reluctant"></label>
         <label>Word class (optional)<select id="fPos">
-          <option value="" selected>Work it out for me</option>
+          <option value="" selected>Don't set one</option>
+          <option value="?">Work it out for me</option>
           <option value="n">noun</option>
           <option value="v">verb</option>
           <option value="a">adjective</option>
@@ -430,11 +431,12 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
 
     <div class="page">
       <h3>Paste a list</h3>
-      <p class="help">Paste straight from a Quizlet export, a spreadsheet column or a typed list. One word a line, word first and meaning second, split by a tab, dash, comma or semicolon. The word class is worked out for you unless you set it below, or write it yourself as <b>word | adjective | meaning | sentence</b>.</p>
+      <p class="help">Paste straight from a Quizlet export, a spreadsheet column or a typed list. One word a line, word first and meaning second, split by a tab, dash, comma or semicolon. Word classes are left out unless you set one below or write it in yourself as <b>word | adjective | meaning | sentence</b>.</p>
       <textarea id="fBulk" spellcheck="false" placeholder="reluctant&#9;unwilling; holding back&#10;ominous - suggesting something bad is coming&#10;trudge, to walk slowly with heavy steps"></textarea>
       <div class="fgrid">
         <label>Word class for this list<select id="fBulkPos">
-          <option value="" selected>Work it out for me</option>
+          <option value="" selected>Don't set one</option>
+          <option value="?">Work it out for me</option>
           <option value="n">all nouns</option>
           <option value="v">all verbs</option>
           <option value="a">all adjectives</option>
@@ -879,7 +881,7 @@ function renderBook() {
   const list = active().filter(w => !q || w.word.toLowerCase().includes(q) || w.def.toLowerCase().includes(q)).slice().sort((a, b) => a.word.localeCompare(b.word));
   const POS = { n: 'noun', v: 'verb', a: 'adjective', adv: 'adverb', num: 'number', g: 'grammar' };
   $('bookGrid').innerHTML = list.map(w => { const s = SAVE.stats[w.word]; const weak = s && s.w > s.r;
-    return `<div class="entry ${weak ? 'weak' : ''}"><b>${esc(w.word)} <small>${POS[w.pos]}</small></b><p>${esc(w.def)}</p></div>`; }).join('') || '<p>No words match that search.</p>';
+    return `<div class="entry ${weak ? 'weak' : ''}"><b>${esc(w.word)} <small>${POS[w.pos] || ''}</small></b><p>${esc(w.def)}</p></div>`; }).join('') || '<p>No words match that search.</p>';
 }
 
 /* ---------- Add words ---------- */
@@ -892,7 +894,7 @@ function bulkMsg(text, ok) { say2('forgeBulkMsg', text, ok); }
 function renderForge() {
   const list = LESSON.list().slice().sort((a, b) => a.word.localeCompare(b.word));
   $('forgeList').innerHTML = list.map(w => `<div class="wordrow">
-      <b>${esc(w.word)}</b><small>${POS_LABEL[w.pos] || w.pos}</small>
+      <b>${esc(w.word)}</b><small>${POS_LABEL[w.pos] || ''}</small>
       <p>${esc(w.def)}</p>
       <button data-del="${esc(w.word)}" aria-label="Remove ${esc(w.word)}">&times;</button>
     </div>`).join('') || '<p class="help">No lesson words yet. Add one above and it appears in every mode.</p>';
@@ -911,7 +913,7 @@ function addFromForm() {
   if (!how) { forgeMsg('That word could not be added. Check the spelling and meaning.'); return; }
   const saved = LESSON.find(word);
   const warn = $('fSent').value.trim() && saved && !saved.sent ? ' The sentence did not contain the word, so it was left out.' : '';
-  const guessed = !$('fPos').value && saved ? ` Taken as ${POS_LABEL[saved.pos] || saved.pos}; set the class above and add it again if that is wrong.` : '';
+  const guessed = $('fPos').value === '?' && saved && saved.pos ? ` Taken as ${POS_LABEL[saved.pos]}; set the class above and add it again if that is wrong.` : '';
   forgeMsg(`${word} ${how === 'updated' ? 'updated' : 'added'}. It can come up in the next question.${guessed}${warn}`, true);
   $('fWord').value = ''; $('fDef').value = ''; $('fSent').value = '';
   renderForge(); $('fWord').focus();
@@ -922,8 +924,9 @@ function previewBulk() {
   const el = $('fPreview');
   if (!rows.length) { el.hidden = true; bulkMsg('No usable lines found. Each line needs a word and a meaning next to each other.'); return; }
   el.hidden = false;
-  el.innerHTML = rows.map(w => `<div class="wordrow"><b>${esc(w.word)}</b><small>${POS_LABEL[w.pos] || w.pos}</small><p>${esc(w.def)}</p></div>`).join('');
-  bulkMsg(`${rows.length} word${rows.length === 1 ? '' : 's'} read. If a word class looks wrong, set it above and check again.`, true);
+  el.innerHTML = rows.map(w => `<div class="wordrow"><b>${esc(w.word)}</b><small>${POS_LABEL[w.pos] || ''}</small><p>${esc(w.def)}</p></div>`).join('');
+  const classed = rows.some(w => w.pos);
+  bulkMsg(`${rows.length} word${rows.length === 1 ? '' : 's'} read.${classed ? ' If a word class looks wrong, set it above and check again.' : ''}`, true);
 }
 function addFromBulk() {
   const rows = bulkRows();

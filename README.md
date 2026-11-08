@@ -16,11 +16,14 @@ Words she gets wrong come back more often. Progress saves in the browser.
 ## Adding words during a lesson
 Open **Add Words** from the title screen. Three ways in:
 
-- **One at a time**: word and meaning, plus an optional word class and example sentence. Leave the class alone and it is worked out from the word and its meaning; the message after adding says which it took. Write `___` where the word goes, or just use the word in the sentence and it gets blanked out for you.
-- **Paste a list**: a Quizlet export pastes in as it comes. One word a line, word first and meaning second, split by a tab, dash, comma or semicolon. The word class is worked out from the word and its meaning; **Check the list** shows what it read before anything is added, and the dropdown forces one class for the whole list if the guesses are off.
+- **One at a time**: a word and a meaning are all that is needed. Write `___` in the example sentence where the word goes, or just use the word in the sentence and it gets blanked out for you.
+- **Paste a list**: a Quizlet export pastes in as it comes. One word a line, word first and meaning second, split by a tab, dash, comma or semicolon. **Check the list** shows what it read before anything is added.
 - **A share link**: opening the link puts the same words on another device, so a class on tablets gets the same list.
 
 New words appear under the **Lesson words** chip on the title screen, which narrows every mode to just those words. They also show in the Spellbook and in the 3D tower, and tally mistakes like any other word. Quick Fire suits a short list best; the Escape Room needs 58 correct answers, so a handful of words will repeat.
+
+### Word class
+Both ways leave the word class unset by default, so nothing has to be chosen mid-lesson. An unset word draws its wrong answers from any class, which is the safe behaviour: a guessed class that is wrong gives worse options than no class at all. Set one from the dropdown when it matters, pick **Work it out for me** to have it guessed from the word and its meaning, or write it into a pasted line as `word | adjective | meaning | sentence`.
 
 Lesson words live in the browser, not in the repo. To keep them for good, use **Copy lines for words.js** and paste the lines into the `RAW` block described below.
 

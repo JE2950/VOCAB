@@ -172,8 +172,10 @@ function cleanWord(o) {
   const word = String(o.word || '').trim().replace(/\s+/g, ' ');
   const def = String(o.def || '').trim();
   if (!word || !def) return null;
-  /* no word class given, or an unknown one: work it out from the word */
-  const pos = posCode(o.pos) || guessPos(word, def);
+  /* Word class is optional. '?' asks for a guess; anything unrecognised,
+     including nothing at all, leaves it unset, and an unset word draws its
+     wrong answers from any class rather than from a guessed one. */
+  const pos = posCode(o.pos) || (String(o.pos).trim() === '?' ? guessPos(word, def) : '');
   let sent = String(o.sent || '').trim();
   const form = String(o.form || '').trim() || word;
   /* a sentence typed with the word in it becomes a gap-fill automatically */
@@ -315,7 +317,7 @@ const LESSON = {
       /* a meaning that opens with a word class, as in "(adj) very old" */
       const tag = /^[([]\s*([a-z.]{1,10})\s*[)\]]\s*/i.exec(String(o.def || ''));
       if (tag && posCode(tag[1])) { o.pos = o.pos || tag[1]; o.def = o.def.slice(tag[0].length); }
-      o.pos = posCode(o.pos) || posCode(posHint) || guessPos(o.word, o.def);
+      o.pos = posCode(o.pos) || posCode(posHint) || (String(posHint).trim() === '?' ? '?' : '');
       const w = cleanWord(o); if (w) out.push(w);
     }
     return out;
@@ -496,7 +498,9 @@ function pickWeighted(items, keyFn) {
 function remember(k) { recent.push(k); if (recent.length > 14) recent.shift(); }
 
 function poolFor(w) {
-  const same = p => p === w.pos || (w.pos === 'num' && p === 'a') || (w.pos === 'adv' && p === 'adv');
+  /* a word with no class set matches any class, and so does a word used
+     as a wrong answer for it */
+  const same = p => !w.pos || !p || p === w.pos || (w.pos === 'num' && p === 'a') || (w.pos === 'adv' && p === 'adv');
   return WORDS.filter(x => x !== w && same(x.pos) && !(w.group && x.group === w.group) && x.form !== w.form);
 }
 function distractors(w, n, field) {
