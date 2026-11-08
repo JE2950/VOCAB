@@ -172,8 +172,8 @@ function cleanWord(o) {
   const word = String(o.word || '').trim().replace(/\s+/g, ' ');
   const def = String(o.def || '').trim();
   if (!word || !def) return null;
-  let pos = String(o.pos || '').trim().toLowerCase();
-  if (!POS_CODES.includes(pos)) pos = (POS_LIST.find(p => p[1] === pos) || [])[0] || 'n';
+  /* no word class given, or an unknown one: work it out from the word */
+  const pos = posCode(o.pos) || guessPos(word, def);
   let sent = String(o.sent || '').trim();
   const form = String(o.form || '').trim() || word;
   /* a sentence typed with the word in it becomes a gap-fill automatically */

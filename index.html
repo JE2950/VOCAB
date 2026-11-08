@@ -405,10 +405,11 @@ svg.sprite { image-rendering: pixelated; shape-rendering: crispEdges; display: b
       <p class="help">Type a word and its meaning and it joins the games straight away. The example sentence is optional: write <b>___</b> where the word goes, or just use the word and it will be blanked out for you.</p>
       <div class="fgrid">
         <label>Word<input type="text" id="fWord" autocomplete="off" spellcheck="false" placeholder="e.g. reluctant"></label>
-        <label>Word class<select id="fPos">
+        <label>Word class (optional)<select id="fPos">
+          <option value="" selected>Work it out for me</option>
           <option value="n">noun</option>
           <option value="v">verb</option>
-          <option value="a" selected>adjective</option>
+          <option value="a">adjective</option>
           <option value="adv">adverb</option>
           <option value="num">number</option>
         </select></label>
@@ -910,7 +911,8 @@ function addFromForm() {
   if (!how) { forgeMsg('That word could not be added. Check the spelling and meaning.'); return; }
   const saved = LESSON.find(word);
   const warn = $('fSent').value.trim() && saved && !saved.sent ? ' The sentence did not contain the word, so it was left out.' : '';
-  forgeMsg(`${word} ${how === 'updated' ? 'updated' : 'added'}. It can come up in the next question.${warn}`, true);
+  const guessed = !$('fPos').value && saved ? ` Taken as ${POS_LABEL[saved.pos] || saved.pos}; set the class above and add it again if that is wrong.` : '';
+  forgeMsg(`${word} ${how === 'updated' ? 'updated' : 'added'}. It can come up in the next question.${guessed}${warn}`, true);
   $('fWord').value = ''; $('fDef').value = ''; $('fSent').value = '';
   renderForge(); $('fWord').focus();
 }

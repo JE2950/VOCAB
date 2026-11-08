@@ -16,7 +16,7 @@ Words she gets wrong come back more often. Progress saves in the browser.
 ## Adding words during a lesson
 Open **Add Words** from the title screen. Three ways in:
 
-- **One at a time**: word, word class, meaning, and an optional example sentence. Write `___` where the word goes, or just use the word in the sentence and it gets blanked out for you.
+- **One at a time**: word and meaning, plus an optional word class and example sentence. Leave the class alone and it is worked out from the word and its meaning; the message after adding says which it took. Write `___` where the word goes, or just use the word in the sentence and it gets blanked out for you.
 - **Paste a list**: a Quizlet export pastes in as it comes. One word a line, word first and meaning second, split by a tab, dash, comma or semicolon. The word class is worked out from the word and its meaning; **Check the list** shows what it read before anything is added, and the dropdown forces one class for the whole list if the guesses are off.
 - **A share link**: opening the link puts the same words on another device, so a class on tablets gets the same list.
 
